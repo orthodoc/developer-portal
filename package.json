@@ -1,0 +1,22 @@
+{
+    "name": "developer-portal",
+    "author": "Jakub Matejka <jakub@keboola.com>",
+    "license": "MIT",
+    "version": "1.0.0",
+    "description": "Keboola Developer Portal",
+    "keywords": [
+
+    ],
+
+    "repository": "https://github.com/keboola/developer-portal.git",
+    "main": "server.js",
+    "dependencies": {
+        "cognito-helper": "*"
+    },
+    "devDependencies": {
+        "mocha": "^2.3.3"
+    },
+    "scripts": {
+
+    }
+}
