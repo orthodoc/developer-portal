@@ -14,7 +14,8 @@
         "cognito-helper": "*"
     },
     "devDependencies": {
-        "mocha": "^2.3.3"
+        "chai": "*",
+        "mocha": "*"
     },
     "scripts": {
 
