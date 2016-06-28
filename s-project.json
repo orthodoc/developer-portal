@@ -1,0 +1,76 @@
+{
+  "name": "keboola-developer-portal",
+  "custom": {
+    "cognitoIdentityPool": {
+      "AllowUnauthenticatedIdentities": false,
+      "CognitoIdentityProviders": [
+        {
+          "ClientId": "${cognitoUserIdentityPoolClientId}",
+          "ProviderName": "cognito-idp.${region}.amazonaws.com/${cognitoUserIdentityPoolId}"
+        }
+      ],
+      "SupportedLoginProviders": {
+        "string": "string"
+      },
+      "IdentityPoolName": "${project} ${stage}",
+      "Roles": {
+        "authenticated": "${cognitoAuthenticatedRole}",
+        "unauthenticated": "${cognitoUnauthenticatedRole}"
+      },
+      "DeveloperProviderName": "string",
+      "OpenIdConnectProviderARNs": [
+        "arn:aws:cognito-idp.${region}.amazonaws.com/${cognitoUserIdentityPoolId}"
+      ]
+    },
+    "cognitoUserIdentityPool": {
+      "AliasAttributes": [
+        "email"
+      ],
+      "EmailVerificationMessage": "{####}",
+      "EmailVerificationSubject": "Email Verification Subject",
+      "SmsAuthenticationMessage": "{####}",
+      "SmsVerificationMessage": "{####}",
+      "LambdaConfig": {},
+      "MfaConfiguration": "OFF",
+      "Policies": {
+        "PasswordPolicy": {
+          "MinimumLength": 8,
+          "RequireLowercase": false,
+          "RequireNumbers": false,
+          "RequireSymbols": false,
+          "RequireUppercase": false
+        }
+      },
+      "PoolName": "${project}-${stage}",
+      "CustomAttributes": [
+        {
+          "AttributeDataType": "String",
+          "DeveloperOnlyAttribute": false,
+          "Mutable": true,
+          "Name": "vendor",
+          "Required": true,
+          "StringAttributeConstraints": {
+            "MaxLength": "50",
+            "MinLength": "1"
+          }
+        },
+        {
+          "AttributeDataType": "Number",
+          "DeveloperOnlyAttribute": true,
+          "Mutable": true,
+          "Name": "Approved",
+          "Required": true,
+          "Default": "0",
+            "NumberAttributeConstraints": {
+                "MaxValue": "1",
+                "MinValue": "0"
+            }
+        }
+      ],
+      "AutoVerifiedAttributes": []
+    }
+  },
+  "plugins": [
+    "serverless-cognito-manager"
+  ]
+}
