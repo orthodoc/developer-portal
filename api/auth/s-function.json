@@ -5,15 +5,17 @@
   "customName": false,
   "customRole": false,
   "handler": "auth/handler.handler",
-  "timeout": 10,
-  "memorySize": 128,
+  "timeout": 30,
+  "memorySize": 1024,
   "authorizer": {},
   "custom": {
-    "excludePatterns": []
+      "optimize": {
+          "exclude": ["aws-sdk"]
+      }
   },
   "endpoints": [
     {
-      "path": "auth/login",
+      "path": "auth/{operation}",
       "method": "POST",
       "type": "AWS",
       "authorizationType": "none",
@@ -24,44 +26,49 @@
         "application/json": ""
       },
       "responses": {
+        "401": {
+          "statusCode": "401"
+        },
         "400": {
           "statusCode": "400"
         },
         "default": {
           "statusCode": "200",
-          "responseParameters": {},
+          "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,Cache-Control'",
+            "method.response.header.Access-Control-Allow-Methods": "'*'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+          },
           "responseModels": {
-            "application/json;charset=UTF-8": "Empty"
+            "application/json": "Empty"
           },
           "responseTemplates": {
-            "application/json;charset=UTF-8": ""
+            "application/json": ""
           }
         }
       }
     },
     {
-      "path": "auth/signup",
-      "method": "POST",
+      "path": "auth/{operation}",
+      "method": "OPTIONS",
       "type": "AWS",
       "authorizationType": "none",
-      "authorizerFunction": false,
       "apiKeyRequired": false,
       "requestParameters": {},
       "requestTemplates": {
-        "application/json": ""
+        "application/json": "\"statusCode\": 200"
       },
       "responses": {
-        "400": {
-          "statusCode": "400"
-        },
         "default": {
           "statusCode": "200",
-          "responseParameters": {},
-          "responseModels": {
-            "application/json;charset=UTF-8": "Empty"
+          "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,Cache-Control'",
+            "method.response.header.Access-Control-Allow-Methods": "'*'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
           },
+          "responseModels": {},
           "responseTemplates": {
-            "application/json;charset=UTF-8": ""
+            "application/json": ""
           }
         }
       }

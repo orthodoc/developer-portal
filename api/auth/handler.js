@@ -1,15 +1,9 @@
-require('dotenv').load();
-var jwt = require('./libs/jwt');
+var jwt = require('../lib/jwt');
 
 var CognitoHelper = require('cognito-helper');
 var cognito = new CognitoHelper();
 
-/*
-|--------------------------------------------------------------------------
-| AWS invokes this method to process requests
-|--------------------------------------------------------------------------
-*/
-exports.handler  = function(event, context) {
+module.exports.handler = function(event, context) {
 
   // /auth/{operation}
   var operation = event.operation;
@@ -40,9 +34,9 @@ exports.handler  = function(event, context) {
   var makeError = function(err) {
     var errorCode = 'Bad Request';
     switch(err.code) {
-    case 404: errorCode = 'Not Found'; break;
-    case 409: errorCode = 'Conflict'; break;
-    case 401: errorCode = 'Unauthorized'; break;
+      case 404: errorCode = 'Not Found'; break;
+      case 409: errorCode = 'Conflict'; break;
+      case 401: errorCode = 'Unauthorized'; break;
     }
     return new Error(errorCode + ': ' + (err.error || err));
   };
@@ -57,8 +51,7 @@ exports.handler  = function(event, context) {
   };
 
   if(operation === 'login') {
-    cognito.login(payload.email, payload.password, payload.reset,
-        tokenCallback);
+    cognito.login(payload.email, payload.password, payload.reset, tokenCallback);
   }
   else if(operation === 'signup') {
     cognito.signup(payload.name, payload.email, payload.password,

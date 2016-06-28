@@ -71,6 +71,7 @@
     }
   },
   "plugins": [
-    "serverless-cognito-manager"
+    "serverless-cognito-manager",
+      "serverless-optimizer-plugin"
   ]
 }
