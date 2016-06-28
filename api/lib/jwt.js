@@ -5,10 +5,10 @@ var jwt = module.exports;
 
 jwt.create = function createJWT(userId, expiresIn) {
     var exp;
-    if(process.env.EXPIRES_IN) {
+    if (process.env.EXPIRES_IN) {
         exp = moment().add(process.env.EXPIRES_IN, 'seconds');
     }
-    else if(expiresIn) {
+    else if (expiresIn) {
         exp = moment().add(expiresIn, 'seconds');
     }
     else {
@@ -26,7 +26,7 @@ jwt.create = function createJWT(userId, expiresIn) {
 
 jwt.verify = function verifyJWT(authorization, dontFail) {
     if (!authorization) {
-        if(dontFail) {
+        if (dontFail) {
             return null;
         }
         else {
@@ -42,7 +42,7 @@ jwt.verify = function verifyJWT(authorization, dontFail) {
     var now = moment().unix();
 
     if (payload.exp <= now - 60) {
-        if(dontFail) {
+        if (dontFail) {
             return null;
         }
         else {

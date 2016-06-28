@@ -1,90 +1,92 @@
 {
-  "name": "auth",
-  "runtime": "nodejs4.3",
-  "description": "Serverless Lambda function for project: keboola-developer-portal",
-  "customName": false,
-  "customRole": false,
-  "handler": "auth/handler.handler",
-  "timeout": 30,
-  "memorySize": 1024,
-  "authorizer": {},
-  "custom": {
-      "optimize": {
-          "exclude": ["aws-sdk"]
-      }
-  },
-  "endpoints": [
-    {
-      "path": "auth/{operation}",
-      "method": "POST",
-      "type": "AWS",
-      "authorizationType": "none",
-      "authorizerFunction": false,
-      "apiKeyRequired": false,
-      "requestParameters": {},
-      "requestTemplates": {
-        "application/json": ""
-      },
-      "responses": {
-        "401": {
-          "statusCode": "401"
-        },
-        "400": {
-          "statusCode": "400"
-        },
-        "default": {
-          "statusCode": "200",
-          "responseParameters": {
-            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,Cache-Control'",
-            "method.response.header.Access-Control-Allow-Methods": "'*'",
-            "method.response.header.Access-Control-Allow-Origin": "'*'"
-          },
-          "responseModels": {
-            "application/json": "Empty"
-          },
-          "responseTemplates": {
-            "application/json": ""
-          }
+    "name": "auth",
+    "runtime": "nodejs4.3",
+    "description": "Serverless Lambda function for project: keboola-developer-portal",
+    "customName": false,
+    "customRole": false,
+    "handler": "auth/handler.handler",
+    "timeout": 30,
+    "memorySize": 1024,
+    "authorizer": {},
+    "custom": {
+        "optimize": {
+            "exclude": [
+                "aws-sdk"
+            ]
         }
-      }
     },
-    {
-      "path": "auth/{operation}",
-      "method": "OPTIONS",
-      "type": "AWS",
-      "authorizationType": "none",
-      "apiKeyRequired": false,
-      "requestParameters": {},
-      "requestTemplates": {
-        "application/json": "\"statusCode\": 200"
-      },
-      "responses": {
-        "default": {
-          "statusCode": "200",
-          "responseParameters": {
-            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,Cache-Control'",
-            "method.response.header.Access-Control-Allow-Methods": "'*'",
-            "method.response.header.Access-Control-Allow-Origin": "'*'"
-          },
-          "responseModels": {},
-          "responseTemplates": {
-            "application/json": ""
-          }
+    "endpoints": [
+        {
+            "path": "auth/{operation}",
+            "method": "POST",
+            "type": "AWS",
+            "authorizationType": "none",
+            "authorizerFunction": false,
+            "apiKeyRequired": false,
+            "requestParameters": {},
+            "requestTemplates": {
+                "application/json": ""
+            },
+            "responses": {
+                "401": {
+                    "statusCode": "401"
+                },
+                "400": {
+                    "statusCode": "400"
+                },
+                "default": {
+                    "statusCode": "200",
+                    "responseParameters": {
+                        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,Cache-Control'",
+                        "method.response.header.Access-Control-Allow-Methods": "'*'",
+                        "method.response.header.Access-Control-Allow-Origin": "'*'"
+                    },
+                    "responseModels": {
+                        "application/json": "Empty"
+                    },
+                    "responseTemplates": {
+                        "application/json": ""
+                    }
+                }
+            }
+        },
+        {
+            "path": "auth/{operation}",
+            "method": "OPTIONS",
+            "type": "AWS",
+            "authorizationType": "none",
+            "apiKeyRequired": false,
+            "requestParameters": {},
+            "requestTemplates": {
+                "application/json": "\"statusCode\": 200"
+            },
+            "responses": {
+                "default": {
+                    "statusCode": "200",
+                    "responseParameters": {
+                        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,Cache-Control'",
+                        "method.response.header.Access-Control-Allow-Methods": "'*'",
+                        "method.response.header.Access-Control-Allow-Origin": "'*'"
+                    },
+                    "responseModels": {},
+                    "responseTemplates": {
+                        "application/json": ""
+                    }
+                }
+            }
         }
-      }
+    ],
+    "events": [],
+    "environment": {
+        "SERVERLESS_PROJECT": "${project}",
+        "SERVERLESS_STAGE": "${stage}",
+        "SERVERLESS_REGION": "${region}",
+        "COGNITO_IDENTITY_POOL_ID": "${cognitoIdentityPoolId}",
+        "COGNITO_DEVELOPER_PROVIDER_NAME": "${cognitoDeveloperProviderName}",
+        "TOKEN_SECRET": "${jwtTokenSecret}"
+    },
+    "vpc": {
+        "securityGroupIds": [],
+        "subnetIds": []
     }
-  ],
-  "events": [],
-  "environment": {
-    "SERVERLESS_PROJECT": "${project}",
-    "SERVERLESS_STAGE": "${stage}",
-    "SERVERLESS_REGION": "${region}",
-      "COGNITO_IDENTITY_POOL_ID": "${cognitoIdentityPoolId}",
-      "COGNITO_DEVELOPER_PROVIDER_NAME": "${cognitoDeveloperProviderName}",
-      "TOKEN_SECRET": "${jwtTokenSecret}"
-  },
-  "vpc": {
-    "securityGroupIds": [],
-    "subnetIds": []
-  }
 }
