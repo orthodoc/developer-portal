@@ -1,3 +1,4 @@
+var jwt = require('../lib/jwt');
 var response = require('../lib/response');
 
 var CognitoHelper = require('cognito-helper');
@@ -15,13 +16,29 @@ var cognito = new CognitoHelper({
 
 var vandium = require('vandium');
 
-vandium.jwt().configure({
-    algorithm: 'HS256',
-    secret: JWT_SECRET
-});
-
 module.exports.handler = vandium( function (event, context, callback) {
 
-    cognito.getCredentials(userId, dataCallback);
+    var ensureAuthenticated = function(callbackLocal) {
+        var t = jwt.verify(event.jwt);
+        if(t.message) {
+            callback(new Error('Unauthorized: ' + t.message));
+        }
+        else {
+            callbackLocal(t);
+        }
+    };
+
+    var dataCallback = function(err, data) {
+        if(err) {
+            callback(response.makeError(err));
+        }
+        else {
+            callback(null, data);
+        }
+    };
+
+    ensureAuthenticated(function(userId) {
+        cognito.getCredentials(userId, dataCallback);
+    });
     
 });

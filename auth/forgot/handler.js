@@ -17,6 +17,15 @@ var vandium = require('vandium');
 
 module.exports.handler = vandium( function (event, context, callback) {
 
-    cognito.forgotPassword(payload.email, response.dataCallback);
+    var dataCallback = function(err, data) {
+        if(err) {
+            callback(response.makeError(err));
+        }
+        else {
+            callback(null, data);
+        }
+    };
+    
+    cognito.forgotPassword(event.email, dataCallback);
 
 });

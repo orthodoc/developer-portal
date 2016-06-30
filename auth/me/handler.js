@@ -18,16 +18,13 @@ var vandium = require('vandium');
 
 module.exports.handler = vandium( function (event, context, callback) {
 
-    var ensureAuthenticated = function(callback) {
-        var authorization = event.authorization;
-        delete event.authorization;
-
-        var t = jwt.verify(authorization);
+    var ensureAuthenticated = function(callbackLocal) {
+        var t = jwt.verify(event.jwt);
         if(t.message) {
             callback(new Error('Unauthorized: ' + t.message));
         }
         else {
-            callback(t);
+            callbackLocal(t);
         }
     };
 

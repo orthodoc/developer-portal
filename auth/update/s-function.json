@@ -9,12 +9,6 @@
     "memorySize": 1024,
     "authorizer": {},
     "custom": {
-        "optimize": {
-            "exclude": [
-                "aws-sdk",
-                "vandium"
-            ]
-        },
         "cors": {
             "allowOrigin": "*",
             "allowHeaders": ["Content-Type", "X-Amz-Date", "Authorization", "X-Api-Key"]
@@ -30,32 +24,9 @@
             "apiKeyRequired": false,
             "requestParameters": {},
             "requestTemplates": {
-                "application/json": ""
+                "application/json": "{\"jwt\":\"$input.params().header.get('Authorization')\"}"
             },
-            "responses": {
-                "400": {
-                    "statusCode": "400"
-                },
-                "401": {
-                    "statusCode": "401"
-                },
-                "404": {
-                    "statusCode": "404"
-                },
-                "409": {
-                    "statusCode": "409"
-                },
-                "default": {
-                    "statusCode": "200",
-                    "responseParameters": {},
-                    "responseModels": {
-                        "application/json": "Empty"
-                    },
-                    "responseTemplates": {
-                        "application/json": ""
-                    }
-                }
-            }
+            "responses": "$${endpointResponsesTemplate}"
         }
     ],
     "events": [],
@@ -66,7 +37,7 @@
         "AWS_ACCOUNT_ID": "${awsAccountId}",
         "COGNITO_IDENTITY_POOL_ID": "${cognitoIdentityPoolId}",
         "COGNITO_DEVELOPER_PROVIDER_NAME": "${cognitoDeveloperProviderName}",
-        "JWT_SECRET": "${vandiumJwtSecret}"
+        "JWT_SECRET": "${jwtSecret}"
     },
     "vpc": {
         "securityGroupIds": [],

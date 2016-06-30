@@ -17,11 +17,9 @@ var cognito = new CognitoHelper({
 var vandium = require('vandium');
 
 vandium.validation({
-    payload: vandium.types.object().keys({
-        email: vandium.types.email().required(),
-        password: vandium.types.string().required(),
-        reset: vandium.types.string()
-    })
+    email: vandium.types.email().required(),
+    password: vandium.types.string().required(),
+    reset: vandium.types.string()
 });
 
 module.exports.handler = vandium( function (event, context, callback) {
@@ -35,6 +33,6 @@ module.exports.handler = vandium( function (event, context, callback) {
         }
     };
 
-    cognito.login(event.payload.email, event.payload.password, event.payload.reset, tokenCallback);
+    cognito.login(event.email, event.password, event.reset, tokenCallback);
 
 });
