@@ -71,6 +71,8 @@
         }
     },
     "plugins": [
+        "serverless-serve",
+        "serverless-cors-plugin",
         "serverless-cognito-manager",
         "serverless-optimizer-plugin"
     ]

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "cognito-helper": "*",
+    "vandium": "^2.7.1"
+  }
+}

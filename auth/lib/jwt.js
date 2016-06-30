@@ -21,7 +21,7 @@ jwt.create = function createJWT(userId, expiresIn) {
         exp: exp.unix()
     };
 
-    return jwtSimple.encode(payload, process.env.TOKEN_SECRET);
+    return jwtSimple.encode(payload, process.env.JWT_SECRET);
 };
 
 jwt.verify = function verifyJWT(authorization, dontFail) {
@@ -35,7 +35,7 @@ jwt.verify = function verifyJWT(authorization, dontFail) {
     }
     var token = authorization.split(' ')[1];
     try {
-        var payload = jwtSimple.decode(token, process.env.TOKEN_SECRET);
+        var payload = jwtSimple.decode(token, process.env.JWT_SECRET);
     } catch (e) {
         return {code: 401, message: e.message};
     }

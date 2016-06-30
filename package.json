@@ -10,9 +10,11 @@
     },
     "main": "server.js",
     "dependencies": {
+        "serverless-cors-plugin": "^0.4.1",
         "serverless-optimizer-plugin": "^2.5.1"
     },
     "devDependencies": {
+        "serverless-serve": "^1.7.2",
         "chai": "*",
         "mocha": "*"
     },
