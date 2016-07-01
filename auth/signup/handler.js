@@ -1,7 +1,7 @@
 var jwt = require('../lib/jwt');
 var response = require('../lib/response');
 
-var CognitoHelper = require('cognito-helper');
+var CognitoHelper = require('../lib/cognito-helper/cognito-helper');
 var cognito = new CognitoHelper({
     AWS_ACCOUNT_ID: process.env.AWS_ACCOUNT_ID,
     COGNITO_IDENTITY_POOL_ID: process.env.COGNITO_IDENTITY_POOL_ID,
@@ -23,7 +23,7 @@ vandium.validation({
     vendor: vandium.types.string().required()
 });
 
-module.exports.handler = vandium( function (event, context, callback) {
+module.exports.handler = vandium(function (event, context, callback) {
 
     tokenCallback = function (err, data) {
         if (err) {
@@ -34,6 +34,6 @@ module.exports.handler = vandium( function (event, context, callback) {
         }
     };
 
-    cognito.signup(event.name, event.email, event.password, tokenCallback);
+    cognito.signup(event.name, event.email, event.password, event.vendor, tokenCallback);
     
 });
