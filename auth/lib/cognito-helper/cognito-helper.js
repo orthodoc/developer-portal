@@ -27,8 +27,6 @@ function CognitoHelper(config) {
 
     var cognitoSync = new AWS.CognitoSync();
 
-    var ses = new AWS.SES();
-
     var encryptPassword = function (password) {
         return sha256(password);
     };
@@ -61,7 +59,7 @@ function CognitoHelper(config) {
             IdentityId: identityId,
             DatasetName: config.COGNITO_DATASET_NAME
         };
-        logger.debug('listRecords', params);
+        logger.debug('CUSTOM listRecords', params);
 
         cognitoSync.listRecords(params, function (err, dataRecords) {
             if (err) {
@@ -102,7 +100,7 @@ function CognitoHelper(config) {
             IdentityId: identityId,
             DatasetName: config.COGNITO_DATASET_NAME
         };
-        logger.debug('listRecords', params);
+        logger.debug('CUSTOM listRecords', params);
 
         cognitoSync.listRecords(params, function (err, dataRecords) {
             if (err) {
@@ -110,9 +108,11 @@ function CognitoHelper(config) {
             }
             else {
                 var recordPatches = [];
+                var key;
+                var record;
 
-                for (var key in dataCreate) {
-                    var record = _.find(dataRecords.Records, function (r) {
+                for (key in dataCreate) {
+                    record = _.find(dataRecords.Records, function (r) {
                         return r.Key === key;
                     });
                     if (!record) {
@@ -125,8 +125,8 @@ function CognitoHelper(config) {
                     }
                 }
 
-                for (var key in dataReplace) {
-                    var record = _.find(dataRecords.Records, function (r) {
+                for (key in dataReplace) {
+                    record = _.find(dataRecords.Records, function (r) {
                         return r.Key === key;
                     });
                     recordPatches.push({
@@ -137,8 +137,8 @@ function CognitoHelper(config) {
                     });
                 }
 
-                for (var key in dataRemove) {
-                    var record = _.find(dataRecords.Records, function (r) {
+                for (key in dataRemove) {
+                    record = _.find(dataRecords.Records, function (r) {
                         return r.Key === key;
                     });
                     if (record) {
@@ -153,11 +153,11 @@ function CognitoHelper(config) {
 
                 params.SyncSessionToken = dataRecords.SyncSessionToken;
                 params.RecordPatches = recordPatches;
-                logger.debug('updateRecords', params);
+                logger.debug('CUSTOM updateRecords', params);
 
                 cognitoSync.updateRecords(params, function (err, data) {
                     if (err) {
-                        logger.debug('updateRecords err', err);
+                        logger.debug('CUSTOM updateRecords err', err);
                     }
                     // ignore err as may get ResourceConflictException
                     // but still have updated successfully
@@ -207,7 +207,7 @@ function CognitoHelper(config) {
     };
 
     var getCredentialsForIdentity = function (params, callback) {
-        logger.debug('getCredentialsForIdentity ', params);
+        logger.debug('CUSTOM getCredentialsForIdentity ', params);
 
         cognitoIdentity.getCredentialsForIdentity(params,
             function (err, dataCredentials) {
@@ -215,7 +215,7 @@ function CognitoHelper(config) {
                     if (err.message === 'Invalid login token.') {
                         // attempted to validate but provider token has expired,
                         // need to use refresh token to get a new one
-                        logger.debug('needs refresh', err);
+                        logger.debug('CUSTOM needs refresh', err);
 
                         CognitoHelper.refreshProvider(params.IdentityId,
                             function (err, dataRefresh) {
@@ -299,9 +299,10 @@ function CognitoHelper(config) {
                 if (err)
                     callback('cannot get password ' + err);
                 else {
+                    var p;
                     if (reset) {
                         // verifying with reset
-                        var p = encryptPassword(reset);
+                        p = encryptPassword(reset);
                         if (!data.reset)
                             callback('reset does not exist');
                         else if (p !== data.reset) {
@@ -314,7 +315,7 @@ function CognitoHelper(config) {
                     }
                     else if (password) {
                         // verifying with password
-                        var p = encryptPassword(password);
+                        p = encryptPassword(password);
                         if (!data.password)
                             callback('password does not exist');
                         else if (p !== data.password)
@@ -369,7 +370,7 @@ function CognitoHelper(config) {
             Logins: logins,
             //TokenDuration: 60
         };
-        logger.debug('getOpenIdTokenForDeveloperIdentity', params);
+        logger.debug('CUSTOM getOpenIdTokenForDeveloperIdentity', params);
 
         cognitoIdentity.getOpenIdTokenForDeveloperIdentity(params, callback);
     };
@@ -385,14 +386,15 @@ function CognitoHelper(config) {
      */
     CognitoHelper.getId = function (provider, token, callback) {
         var p = normalizeProvider(provider, token);
+        var params;
 
         if (p.isDeveloper) {
-            var params = {
+            params = {
                 IdentityPoolId: config.COGNITO_IDENTITY_POOL_ID,
                 DeveloperUserIdentifier: p.token,
                 MaxResults: 10
             };
-            logger.debug('lookupDeveloperIdentity', params);
+            logger.debug('CUSTOM lookupDeveloperIdentity', params);
 
             cognitoIdentity.lookupDeveloperIdentity(params, callback);
         }
@@ -400,15 +402,185 @@ function CognitoHelper(config) {
             var logins = {};
             logins[p.name] = p.token;
 
-            var params = {
+            params = {
                 IdentityPoolId: config.COGNITO_IDENTITY_POOL_ID,
                 AccountId: config.AWS_ACCOUNT_ID,
                 Logins: logins
             };
-            logger.debug('getId', params);
+            logger.debug('CUSTOM getId', params);
 
             cognitoIdentity.getId(params, callback);
         }
+    };
+
+    /**
+     * Retrieves records from a CognitoSync profile dataset.
+     * @param {String} identityId - CognitoIdentity ID
+     * @param {Array} keys - only records whose names start with these keys
+     * @param callback - function(err, data)
+     */
+    CognitoHelper.getRecords = function(identityId, keys, callback) {
+        var params = {
+            IdentityPoolId: config.COGNITO_IDENTITY_POOL_ID,
+            IdentityId: identityId,
+            DatasetName: config.COGNITO_DATASET_NAME
+        };
+        logger.debug('CUSTOM listRecords', params);
+
+        cognitoSync.listRecords(params, function(err, dataRecords) {
+            if(err) {
+                callback(err);
+            }
+            else {
+                var ret = {};
+
+                _.each(keys, function(key) {
+                    var records = _.filter(dataRecords.Records, function(r) {
+                        return _.startsWith(r.Key, key);
+                    });
+
+                    _.each(records, function(record) {
+                        ret[record.Key] = record.Value;
+                    });
+
+                });
+
+                callback(null, ret);
+            }
+        });
+    };
+
+    /**
+     * Retrieves all developer (non federated) identifiers like user emails or
+     * ids with federated providers not integrated with AWS like PayPal or Stripe.
+     * @param {String} identityId - CognitoIdentity ID
+     * @param callback - function(err, data)
+     */
+    CognitoHelper.getDeveloperTokens = function(identityId, callback) {
+        var params = {
+            IdentityPoolId: config.COGNITO_IDENTITY_POOL_ID,
+            IdentityId: identityId,
+            MaxResults: 10};
+        logger.debug('CUSTOM lookupDeveloperIdentity', params);
+
+        cognitoIdentity.lookupDeveloperIdentity(params, function(err, data) {
+            if(err) {
+                callback([]);
+            }
+            else {
+                callback(data.DeveloperUserIdentifierList);
+            }
+        });
+    };
+
+    /**
+     * Retrieves from CognitoIdenity a list of federated providers which the user
+     * has logins with. Use to display a list of linked logins in a
+     * user's profile.
+     * @param {String} identityId - CognitoIdentity ID
+     * @param finalCallback - function(err, data)
+     */
+    CognitoHelper.describe = function(identityId, finalCallback) {
+        async.parallel({
+                describeIdentity: function(callback) {
+                    var params = {IdentityId:identityId};
+                    logger.debug('CUSTOM describeIdentity', params);
+
+                    cognitoIdentity.describeIdentity(params, function(err, data) {
+                        if(err) {
+                            callback(err);
+                        }
+                        else {
+                            var u = {};
+                            u.id = data.IdentityId;
+
+                            _.each(data.Logins, function(p) {
+                                if(p === 'accounts.google.com')
+                                    u.google = true;
+                                else if(p === 'graph.facebook.com')
+                                    u.facebook = true;
+                                else if(p === 'www.amazon.com')
+                                    u.amazon = true;
+                                else if(p === 'api.twitter.com')
+                                    u.twitter = true;
+                            });
+
+                            callback(null, u);
+                        }
+                    });
+                },
+                getDeveloperTokens: function(callback) {
+                    CognitoHelper.getDeveloperTokens(identityId, function(developerTokens) {
+                        var u = {};
+
+                        _.each(developerTokens, function(t) {
+                            var d = t.substring(0, t.indexOf(config.COGNITO_SEPARATOR));
+                            if(d)
+                                u[d] = true;
+                            else
+                                u.email = t;
+                        });
+
+                        callback(null, u);
+                    });
+                }
+            }
+            , function(err, results) {
+                if(err)
+                    finalCallback(err);
+                else
+                    finalCallback(null,
+                        _.merge(results.describeIdentity, results.getDeveloperTokens));
+            });
+    };
+
+    CognitoHelper.getProfile = function(identityId, finalCallback) {
+        async.parallel({
+                describe: function(callback) {
+                    CognitoHelper.describe(identityId, callback);
+                },
+                getRecords: function(callback) {
+                    CognitoHelper.getRecords(identityId,
+                        ['name','provider','profile','password','vendor','isApproved'],
+                        function(err, data) {
+                            if(err) {
+                                callback(err);
+                            }
+                            else {
+                                var user = {};
+
+                                user.name = data.name;
+                                user.provider = data.provider;
+                                user.vendor = data.vendor;
+                                user.isApproved = data.isApproved;
+
+                                for(var a in data) {
+                                    if(_.startsWith(a, 'profile'))
+                                        user[a] = data[a];
+                                }
+
+                                user.password = data.password ? true : false;
+
+                                callback(null, user);
+                            }
+                        });
+                }
+            },
+            function(err, results) {
+                if(err) {
+                    finalCallback(err);
+                }
+                else {
+                    var user = _.merge(results.describe, results.getRecords);
+
+                    user.name = user.name || user.email || user.id;
+
+                    // for compatibility with satellizer
+                    user.displayName = user.name;
+
+                    finalCallback(null, user);
+                }
+            });
     };
 
 }
