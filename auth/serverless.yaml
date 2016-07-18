@@ -1,0 +1,37 @@
+service: developer-portal-auth
+
+provider: aws
+
+defaults:
+  stage: dev
+  region: us-east-1
+  timeout: 30
+  memory: 256
+
+include:
+  - lib
+  - node_modules
+exclude:
+  - package.json
+
+plugins:
+
+functions:
+  login:
+    handler: auth.login
+    events:
+      - http:
+        path: login
+        method: POST
+  me:
+    handler: auth.me
+    events:
+      - http:
+        path: me
+        method: GET
+  signup:
+    handler: auth.signup
+    events:
+      - http:
+        path: signup
+        method: POST
