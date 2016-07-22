@@ -30,7 +30,8 @@ var customCognito = new CustomCognitoHelper({
 });
 
 module.exports.login = function (event, context, callback) {
-
+  //TODO
+  console.log('PROCESS ENV::', process.env);
   var tokenCallback = function (err, data) {
     if (err) {
       callback(response.makeError(err), data);
@@ -47,10 +48,10 @@ module.exports.login = function (event, context, callback) {
     }
   };
 
-  cognito.login(event.email, event.password, event.reset, tokenCallback);
+  cognito.login(event.body.email, event.body.password, event.body.reset, tokenCallback);
 };
 
-module.exports.me = function (event, context, callback) {
+module.exports.profile = function (event, context, callback) {
 
   var ensureAuthenticated = function(callbackLocal) {
     var t = jwt.verify(event.jwt);
@@ -87,5 +88,5 @@ module.exports.signup = function (event, context, callback) {
     }
   };
 
-  customCognito.signup(event.name, event.email, event.password, event.vendor, tokenCallback);
+  customCognito.signup(event.body.name, event.body.email, event.body.password, event.body.vendor, tokenCallback);
 };

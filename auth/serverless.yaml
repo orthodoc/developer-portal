@@ -14,24 +14,22 @@ include:
 exclude:
   - package.json
 
-plugins:
+environment:
+  AWS_ACCOUNT_ID: ${awsAccountId}
+  COGNITO_IDENTITY_POOL_ID: ${cognitoIdentityPoolId}
+  COGNITO_DEVELOPER_PROVIDER_NAME: ${cognitoDeveloperProviderName
+  JWT_SECRET: ${jwtSecret}
 
 functions:
   login:
     handler: auth.login
     events:
-      - http:
-        path: login
-        method: POST
-  me:
-    handler: auth.me
+      - http: POST auth/login
+  profile:
+    handler: auth.profile
     events:
-      - http:
-        path: me
-        method: GET
+      - http: GET auth/profile
   signup:
     handler: auth.signup
     events:
-      - http:
-        path: signup
-        method: POST
+      - http: POST auth/signup
