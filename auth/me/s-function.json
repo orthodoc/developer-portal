@@ -4,7 +4,7 @@
     "description": "Serverless Lambda function for project: keboola-developer-portal",
     "customName": false,
     "customRole": false,
-    "handler": "me/handler.handler",
+    "handler": "auth/me/handler.handler",
     "timeout": 30,
     "memorySize": 1024,
     "authorizer": {},

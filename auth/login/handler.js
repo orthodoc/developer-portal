@@ -1,5 +1,5 @@
-var jwt = require('../lib/jwt');
-var response = require('../lib/response');
+var jwt = require('../../lib/jwt');
+var response = require('../../lib/response');
 
 var CognitoHelper = require('cognito-helper');
 var cognito = new CognitoHelper({
@@ -14,7 +14,7 @@ var cognito = new CognitoHelper({
     COGNITO_PASSWORD_RESET_SOURCE: process.env.COGNITO_PASSWORD_RESET_SOURCE || 'Password reset <noreply@yourdomain.com>'
 });
 
-var CustomCognitoHelper = require('../lib/cognito-helper/cognito-helper');
+var CustomCognitoHelper = require('../../lib/cognito-helper/cognito-helper');
 var customCognito = new CustomCognitoHelper({
     AWS_ACCOUNT_ID: process.env.AWS_ACCOUNT_ID,
     COGNITO_IDENTITY_POOL_ID: process.env.COGNITO_IDENTITY_POOL_ID,

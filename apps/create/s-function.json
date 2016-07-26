@@ -1,0 +1,47 @@
+{
+  "name": "apps-create",
+  "runtime": "nodejs4.3",
+  "description": "Serverless Lambda function for project: keboola-developer-portal",
+  "customName": false,
+  "customRole": false,
+  "handler": "apps/create/handler.handler",
+  "timeout": 30,
+  "memorySize": 1024,
+  "authorizer": {},
+  "custom": {
+    "excludePatterns": []
+  },
+  "endpoints": [
+    {
+      "path": "apps",
+      "method": "POST",
+      "type": "AWS",
+      "authorizationType": "none",
+      "authorizerFunction": false,
+      "apiKeyRequired": false,
+      "requestParameters": {},
+      "requestTemplates": {
+        "application/json": "{\"jwt\":\"$input.params().header.get('Authorization')\", \"body\":\"$input.json('$')\"}"
+      },
+      "responses": "$${endpointResponsesTemplate}"
+    }
+  ],
+  "events": [],
+  "environment": {
+    "SERVERLESS_PROJECT": "${project}",
+    "SERVERLESS_STAGE": "${stage}",
+    "SERVERLESS_REGION": "${region}",
+    "AWS_ACCOUNT_ID": "${awsAccountId}",
+    "COGNITO_IDENTITY_POOL_ID": "${cognitoIdentityPoolId}",
+    "COGNITO_DEVELOPER_PROVIDER_NAME": "${cognitoDeveloperProviderName}",
+    "JWT_SECRET": "${jwtSecret}",
+    "RDS_HOST": "${rdsHost}",
+    "RDS_USER": "${rdsUser}",
+    "RDS_PASSWORD": "${rdsPassword}",
+    "RDS_DATABASE": "${rdsDatabase}"
+  },
+  "vpc": {
+    "securityGroupIds": [],
+    "subnetIds": []
+  }
+}
