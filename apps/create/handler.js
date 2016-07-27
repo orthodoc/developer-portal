@@ -4,7 +4,7 @@ var jwt = require('../../lib/jwt');
 var async = require('async');
 
 var mysql = require('mysql');
-var dbPool = mysql.createPool({
+var db = mysql.createPool({
   host: process.env.RDS_HOST,
   user: process.env.RDS_USER,
   password: process.env.RDS_PASSWORD,
@@ -59,47 +59,46 @@ vandium.validation({
 module.exports.handler = vandium( function (event, context, callback) {
   var params = event.body;
 
+  var dbCloseCallback = function(err, result) {
+    db.end();
+    return callback(err, result);
+  };
+
   jwt.authenticate(event.jwt, function (err, userId) {
-    if (err) return callback(err);
+    if (err) return dbCloseCallback(err);
 
-    async.parallel([
-      function (callbackLocal) {
-        dbPool.getConnection(function (err, db) {
-          if (err) return callbackLocal(err);
+    params.user_id = userId;
 
-          db.query('SELECT * FROM `apps` WHERE `id` = ?', [params.id], function (err, result) {
-            if (err) return callbackLocal(err);
-
-            if (result.length != 0) {
-              return callbackLocal(Error('App ' + params.id + ' already exists'));
-            }
-
-            return callbackLocal();
-          });
-        });
-      },
+    async.waterfall([
       function (callbackLocal) {
         cognito.getProfile(userId, function (err, result) {
           if (err) return callbackLocal(err);
 
-          return callbackLocal(null, result);
+          return callbackLocal(null, result.vendor);
+        });
+      },
+      function (vendor, callbackLocal) {
+        db.query('SELECT * FROM `apps` WHERE `id` = ?', [vendor + '.' + params.id], function (err, result) {
+          if (err) return callbackLocal(err);
+
+          if (result.length != 0) {
+            return callbackLocal(Error('App ' + params.id + ' already exists'));
+          }
+
+          return callbackLocal(null, vendor);
         });
       }
-    ], function (err, result) {
-      if (err) return callback(err);
+    ], function (err, vendor) {
+      if (err) return dbCloseCallback(err);
 
-      params.id = result[1].vendor + '.' + params.id;
-      params.vendor_id = result[1].vendor;
+      params.id = vendor + '.' + params.id;
+      params.vendor_id = vendor;
       params.user_id = userId;
 
-      dbPool.getConnection(function (err, db) {
-        if (err) return callback(err);
+      db.query('INSERT INTO apps SET ?', params, function (err, result) {
+        if (err) return dbCloseCallback(err);
 
-        db.query('INSERT INTO apps SET ?', params, function (err, result) {
-          if (err) return callback(err);
-
-          return callback();
-        });
+        return dbCloseCallback();
       });
     });
   });
