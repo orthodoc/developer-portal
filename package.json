@@ -1,22 +1,40 @@
 {
-    "name": "developer-portal",
-    "author": "Jakub Matejka <jakub@keboola.com>",
-    "license": "MIT",
-    "version": "1.0.0",
-    "description": "Keboola Developer Portal",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/keboola/developer-portal.git"
-    },
-    "main": "server.js",
-    "dependencies": {
-        "serverless-cors-plugin": "^0.4.1",
-        "serverless-optimizer-plugin": "^2.5.1"
-    },
-    "devDependencies": {
-        "serverless-serve": "^1.7.2",
-        "chai": "*",
-        "mocha": "*"
-    },
-    "scripts": {}
+  "name": "developer-portal",
+  "author": "Jakub Matejka <jakub@keboola.com>",
+  "license": "MIT",
+  "version": "1.0.0",
+  "description": "Keboola Developer Portal",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/keboola/developer-portal.git"
+  },
+  "main": "server.js",
+  "dependencies": {
+    "async": "^1.4.2",
+    "aws-sdk": "^2.1.28",
+    "bcryptjs": "^2.1.0",
+    "body-parser": "^1.12.3",
+    "dotenv": "^1.2.0",
+    "express": "^4.12.3",
+    "https-proxy-agent": "^1.0.0",
+    "js-sha256": "^0.3.0",
+    "jwt-simple": "^0.3.0",
+    "lodash": "^3.10.1",
+    "log4js": "^0.6.27",
+    "moment": "^2.10.2",
+    "mysql": "^2.11.1",
+    "randomstring": "^1.0.6",
+    "request": "^2.55.0",
+    "string-format": "^0.5.0",
+    "vandium": "^2.7.1"
+  },
+  "devDependencies": {
+    "serverless-cognito-manager": "^1.2.0",
+    "serverless-cors-plugin": "^0.4.1",
+    "serverless-optimizer-plugin": "^2.5.1",
+    "serverless-serve": "^1.7.2",
+    "chai": "*",
+    "mocha": "*"
+  },
+  "scripts": {}
 }

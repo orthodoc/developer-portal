@@ -1,9 +1,10 @@
 'use strict';
 
 var jwt = require('../../lib/jwt');
+var async = require('async');
 
 var mysql = require('mysql');
-var db = mysql.createConnection({
+var dbPool = mysql.createPool({
   host: process.env.RDS_HOST,
   user: process.env.RDS_USER,
   password: process.env.RDS_PASSWORD,
@@ -56,6 +57,7 @@ vandium.validation({
 });
 
 module.exports.handler = vandium( function (event, context, callback) {
+  var params = event.body;
 
   var ensureAuthenticated = function(callbackLocal) {
     var t = jwt.verify(event.jwt);
@@ -67,39 +69,47 @@ module.exports.handler = vandium( function (event, context, callback) {
     }
   };
 
-  var saveApp = function(params, userId, callbackLocal) {
-    db.connect(function(err) {
-      if (err) {
-        throw new Error('error connecting: ' + err.stack);
-      }
+  ensureAuthenticated(function(userId) {
+    async.parallel([
+      function (callback) {
+        console.log('PROMISE 1B');
+        dbPool.getConnection(function(err, db) {
+          if (err) return callback(err);
 
-      db.query('SELECT * FROM `apps` WHERE `id` = ?', [params.id], function (err, result) {
-        if (err) throw err;
+          db.query('SELECT * FROM `apps` WHERE `id` = ?', [params.id], function (err, result) {
+            if (err) return callback(err);
 
-        if (result.length != 0) {
-          throw new Error('App ' + params.id + ' already exists');
-        }
+            if (result.length != 0) {
+              return callback(Error('App ' + params.id + ' already exists'));
+            }
 
-        cognito.getProfile(userId, function(err, result) {
-          if (err) throw err;
-
-          params.vendor_id = result.vendor;
-          params.user_id = userId;
-
-          db.query('INSERT INTO apps SET ?', params, function (err, result) {
-            if (err) throw err;
-
-            db.end();
-            callbackLocal();
+            return callback();
           });
         });
-      });
-    });
-  };
+      },
+      function (callback) {
+        cognito.getProfile(userId, function (err, result) {
+          if (err) return callback(err);
 
-  ensureAuthenticated(function(userId) {
-    saveApp(event.body, userId, function() {
-      return callback(null, {'status': 'ok'});
+          return callback(null, result);
+        });
+      }
+    ], function (err, result) {
+      if (err) callback(err);
+
+      params.id = result[1].vendor + '.' + params.id;
+      params.vendor_id = result[1].vendor;
+      params.user_id = userId;
+
+      dbPool.getConnection(function(err, db) {
+        if (err) return callback(err);
+        db.query('INSERT INTO apps SET ?', params, function (err, result) {
+          if (err) throw err;
+
+          db.end();
+          callback();
+        });
+      });
     });
   });
 
