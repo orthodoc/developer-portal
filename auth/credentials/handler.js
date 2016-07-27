@@ -18,16 +18,6 @@ var vandium = require('vandium');
 
 module.exports.handler = vandium( function (event, context, callback) {
 
-    var ensureAuthenticated = function(callbackLocal) {
-        var t = jwt.verify(event.jwt);
-        if(t.message) {
-            callback(new Error('Unauthorized: ' + t.message));
-        }
-        else {
-            callbackLocal(t);
-        }
-    };
-
     var dataCallback = function(err, data) {
         if(err) {
             callback(response.makeError(err));
@@ -37,7 +27,9 @@ module.exports.handler = vandium( function (event, context, callback) {
         }
     };
 
-    ensureAuthenticated(function(userId) {
+    jwt.authenticate(event.jwt, function(err, userId) {
+        if (err) return callback(err);
+
         cognito.getCredentials(userId, dataCallback);
     });
     

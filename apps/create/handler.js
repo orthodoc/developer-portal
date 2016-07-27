@@ -59,58 +59,48 @@ vandium.validation({
 module.exports.handler = vandium( function (event, context, callback) {
   var params = event.body;
 
-  var ensureAuthenticated = function(callbackLocal) {
-    var t = jwt.verify(event.jwt);
-    if(t.message) {
-      callback(new Error('Unauthorized: ' + t.message));
-    }
-    else {
-      callbackLocal(t);
-    }
-  };
+  jwt.authenticate(event.jwt, function (err, userId) {
+    if (err) return callback(err);
 
-  ensureAuthenticated(function(userId) {
     async.parallel([
-      function (callback) {
-        console.log('PROMISE 1B');
-        dbPool.getConnection(function(err, db) {
-          if (err) return callback(err);
+      function (callbackLocal) {
+        dbPool.getConnection(function (err, db) {
+          if (err) return callbackLocal(err);
 
           db.query('SELECT * FROM `apps` WHERE `id` = ?', [params.id], function (err, result) {
-            if (err) return callback(err);
+            if (err) return callbackLocal(err);
 
             if (result.length != 0) {
-              return callback(Error('App ' + params.id + ' already exists'));
+              return callbackLocal(Error('App ' + params.id + ' already exists'));
             }
 
-            return callback();
+            return callbackLocal();
           });
         });
       },
-      function (callback) {
+      function (callbackLocal) {
         cognito.getProfile(userId, function (err, result) {
-          if (err) return callback(err);
+          if (err) return callbackLocal(err);
 
-          return callback(null, result);
+          return callbackLocal(null, result);
         });
       }
     ], function (err, result) {
-      if (err) callback(err);
+      if (err) return callback(err);
 
       params.id = result[1].vendor + '.' + params.id;
       params.vendor_id = result[1].vendor;
       params.user_id = userId;
 
-      dbPool.getConnection(function(err, db) {
+      dbPool.getConnection(function (err, db) {
         if (err) return callback(err);
-        db.query('INSERT INTO apps SET ?', params, function (err, result) {
-          if (err) throw err;
 
-          db.end();
-          callback();
+        db.query('INSERT INTO apps SET ?', params, function (err, result) {
+          if (err) return callback(err);
+
+          return callback();
         });
       });
     });
   });
-
 });

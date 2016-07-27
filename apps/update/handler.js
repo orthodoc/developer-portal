@@ -44,16 +44,6 @@ vandium.validation({
 
 module.exports.handler = vandium( function (event, context, callback) {
 
-  var ensureAuthenticated = function(callbackLocal) {
-    var t = jwt.verify(event.jwt);
-    if(t.message) {
-      callback(new Error('Unauthorized: ' + t.message));
-    }
-    else {
-      callbackLocal(t);
-    }
-  };
-
   var saveApp = function(appId, params, userId, callbackLocal) {
     db.connect(function(err) {
       if (err) {
@@ -77,7 +67,9 @@ module.exports.handler = vandium( function (event, context, callback) {
     });
   };
 
-  ensureAuthenticated(function(userId) {
+  jwt.authenticate(event.jwt, function(err, userId) {
+    if (err) return callback(err);
+
     saveApp(event.appId, event.body, userId, function() {
       return callback(null, {'status': 'ok'});
     });
