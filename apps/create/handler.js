@@ -78,24 +78,23 @@ module.exports.handler = vandium( function (event, context, callback) {
         });
       },
       function (vendor, callbackLocal) {
-        db.query('SELECT * FROM `apps` WHERE `id` = ?', [vendor + '.' + params.id], function (err, result) {
+        params.vendor_id = vendor;
+        params.id = vendor + '.' + params.id;
+
+        db.query('SELECT * FROM `apps` WHERE `id` = ?', [params.id], function (err, result) {
           if (err) return callbackLocal(err);
 
           if (result.length != 0) {
             return callbackLocal(Error('App ' + params.id + ' already exists'));
           }
 
-          return callbackLocal(null, vendor);
+          return callbackLocal();
         });
       }
-    ], function (err, vendor) {
+    ], function (err) {
       if (err) return dbCloseCallback(err);
 
-      params.id = vendor + '.' + params.id;
-      params.vendor_id = vendor;
-      params.user_id = userId;
-
-      db.query('INSERT INTO apps SET ?', params, function (err, result) {
+      db.query('INSERT INTO apps SET ?', params, function (err) {
         if (err) return dbCloseCallback(err);
 
         return dbCloseCallback();
