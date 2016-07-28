@@ -56,7 +56,7 @@ vandium.validation({
   jwt: vandium.types.string()
 });
 
-module.exports.handler = vandium( function (event, context, callback) {
+module.exports.handler = vandium(function(event, context, callback) {
   var params = event.body;
 
   var dbCloseCallback = function(err, result) {
@@ -90,14 +90,30 @@ module.exports.handler = vandium( function (event, context, callback) {
 
           return callbackLocal();
         });
+      },
+      function (callbackLocal) {
+        db.query('INSERT INTO apps SET ?', params, function (err) {
+          if (err) return callbackLocal(err);
+
+          return callbackLocal();
+        });
       }
     ], function (err) {
       if (err) return dbCloseCallback(err);
 
-      db.query('INSERT INTO apps SET ?', params, function (err) {
+      db.query('SELECT * FROM `apps` WHERE `id` = ?', [event.appId], function (err, result) {
         if (err) return dbCloseCallback(err);
 
-        return dbCloseCallback();
+        delete result[0].user_id;
+        result[0].encryption = result[0].encryption == 1;
+        result[0].default_bucket = result[0].default_bucket == 1;
+        result[0].forward_token = result[0].forward_token == 1;
+        result[0].ui_options = result[0].ui_options ? result[0].ui_options : [];
+        result[0].actions = result[0].actions ? result[0].actions : [];
+        result[0].fees = result[0].fees == 1;
+        result[0].is_approved = result[0].is_approved == 1;
+
+        return dbCloseCallback(null, result[0]);
       });
     });
   });

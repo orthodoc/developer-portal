@@ -35,21 +35,20 @@ vandium.validation({
   reset: vandium.types.string()
 });
 
-module.exports.handler = vandium( function (event, context, callback) {
+module.exports.handler = vandium(function(event, context, callback) {
 
   var tokenCallback = function (err, data) {
-    if (err) {
-      callback(response.makeError(err), data);
-    }
-    else {
-      customCognito.getProfile(data.id, function (err, data) {
-        if (data.isApproved) {
-          callback(null, {token: jwt.create(data.id)});
-        } else {
-          callback(new Error('User has not been approved yet.'));
-        }
-      });
-    }
+    if (err) return callback(response.makeError(err), data);
+
+    customCognito.getProfile(data.id, function (err, profile) {
+      if (err) return callback(response.makeError(err), data);
+
+      if (profile.is_approved) {
+        return callback(null, {token: jwt.create(data.id)});
+      } else {
+        return callback(new Error('User has not been approved yet.'));
+      }
+    });
   };
 
   cognito.login(event.email, event.password, event.reset, tokenCallback);

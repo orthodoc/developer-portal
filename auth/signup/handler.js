@@ -28,7 +28,7 @@ var vandium = require('vandium');
 vandium.validation({
   name: vandium.types.string().required(),
   email: vandium.types.email().required(),
-  password: vandium.types.string().required(),
+  password: vandium.types.string().required().min(8),
   vendor: vandium.types.string().required()
 });
 
@@ -38,7 +38,7 @@ module.exports.handler = vandium(function (event, context, callback) {
       dbCloseCallback(response.makeError(err), data);
     }
     else {
-      dbCloseCallback(null, {token: jwt.create(data.id)});
+      dbCloseCallback();
     }
   };
 
