@@ -3,7 +3,7 @@
 var jwt = require('../../lib/jwt');
 
 var mysql = require('mysql');
-var db = mysql.createConnection({
+var db = mysql.createPool({
   host: process.env.RDS_HOST,
   user: process.env.RDS_USER,
   password: process.env.RDS_PASSWORD,

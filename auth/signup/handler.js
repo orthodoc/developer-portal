@@ -1,7 +1,7 @@
 var jwt = require('../../lib/jwt');
 var response = require('../../lib/response');
 
-var CognitoHelper = require('../lib/cognito-helper/cognito-helper');
+var CognitoHelper = require('../../lib/cognito-helper/cognito-helper');
 var cognito = new CognitoHelper({
   AWS_ACCOUNT_ID: process.env.AWS_ACCOUNT_ID,
   COGNITO_IDENTITY_POOL_ID: process.env.COGNITO_IDENTITY_POOL_ID,
@@ -15,7 +15,7 @@ var cognito = new CognitoHelper({
 });
 
 var mysql = require('mysql');
-var db = mysql.createConnection({
+var db = mysql.createPool({
   host: process.env.RDS_HOST,
   user: process.env.RDS_USER,
   password: process.env.RDS_PASSWORD,
@@ -33,33 +33,27 @@ vandium.validation({
 });
 
 module.exports.handler = vandium(function (event, context, callback) {
-  tokenCallback = function (err, data) {
+  var tokenCallback = function (err, data) {
     if (err) {
-      callback(response.makeError(err), data);
+      dbCloseCallback(response.makeError(err), data);
     }
     else {
-      callback(null, {token: jwt.create(data.id)});
+      dbCloseCallback(null, {token: jwt.create(data.id)});
     }
   };
 
-  db.connect(function(err) {
-    if (err) {
-      console.error('error connecting: ' + err.stack);
-      return;
+  var dbCloseCallback = function(err, result) {
+    db.end();
+    return callback(err, result);
+  };
+
+  db.query('SELECT * FROM `vendors` WHERE `id` = ?', [event.vendor], function (err, result) {
+    if (err) return dbCloseCallback(err);
+
+    if (result.length == 0) {
+      return dbCloseCallback(Error('Vendor ' + event.vendor + ' does not exist'));
     }
 
-    console.log('connected as id ' + db.threadId);
-
-    db.query('SELECT * FROM `vendors` WHERE `id` = ?', [event.vendor], function (err, result) {
-      if (err) throw err;
-
-      if (result.length == 0) {
-        throw new Error('Vendor ' + event.vendor + ' does not exist');
-      }
-
-      cognito.signup(event.name, event.email, event.password, event.vendor, tokenCallback);
-    });
-
-    db.end();
+    cognito.signup(event.name, event.email, event.password, event.vendor, tokenCallback);
   });
 });

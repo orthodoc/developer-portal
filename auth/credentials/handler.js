@@ -1,5 +1,5 @@
-var jwt = require('../lib/jwt');
-var response = require('../lib/response');
+var jwt = require('../../lib/jwt');
+var response = require('../../lib/response');
 
 var CognitoHelper = require('cognito-helper');
 var cognito = new CognitoHelper({
