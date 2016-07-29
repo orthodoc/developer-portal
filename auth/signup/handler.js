@@ -1,3 +1,4 @@
+var aws = require('aws-sdk');
 var jwt = require('../../lib/jwt');
 var response = require('../../lib/response');
 
@@ -38,7 +39,26 @@ module.exports.handler = vandium(function (event, context, callback) {
       dbCloseCallback(response.makeError(err), data);
     }
     else {
-      dbCloseCallback();
+      delete event.password;
+      var ses = new aws.SES({apiVersion: '2010-12-01', region: process.env.SERVERLESS_REGION});
+      ses.sendEmail({
+        Source: process.env.SES_EMAIL,
+        Destination: { ToAddresses: [process.env.SES_EMAIL] },
+        Message: {
+          Subject: {
+            Data: '[dev-portal] User ' + event.email + ' requests approval'
+          },
+          Body: {
+            Text: {
+              Data: JSON.stringify(event, null, 4)
+            }
+          }
+        }
+      }, function(err) {
+        if(err) return dbCloseCallback(err);
+
+        return dbCloseCallback();
+      });
     }
   };
 

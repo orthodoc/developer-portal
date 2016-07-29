@@ -106,7 +106,7 @@ module.exports.handler = vandium(function(event, context, callback) {
           }
         }
       }
-    }, function(err, data) {
+    }, function(err) {
       if(err) return dbCloseCallback(err);
 
       return dbCloseCallback();
