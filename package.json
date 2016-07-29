@@ -25,7 +25,7 @@
     "moment": "^2.10.2",
     "mysql": "^2.11.1",
     "randomstring": "^1.0.6",
-    "request": "^2.55.0",
+    "request": "^2.74.0",
     "string-format": "^0.5.0",
     "vandium": "^2.7.1"
   },

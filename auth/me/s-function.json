@@ -17,7 +17,7 @@
     "endpoints": [
         {
             "path": "auth/me",
-            "method": "POST",
+            "method": "GET",
             "type": "AWS",
             "authorizationType": "none",
             "authorizerFunction": false,
