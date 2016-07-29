@@ -2,16 +2,7 @@
 
 var jwt = require('../../lib/jwt');
 var async = require('async');
-
-var mysql = require('mysql');
-var db = mysql.createPool({
-  host: process.env.RDS_HOST,
-  user: process.env.RDS_USER,
-  password: process.env.RDS_PASSWORD,
-  database: process.env.RDS_DATABASE,
-  ssl: "Amazon RDS"
-});
-
+var db = require('../../lib/db');
 var vandium = require('vandium');
 
 vandium.validation({
@@ -59,18 +50,14 @@ module.exports.handler = vandium(function(event, context, callback) {
       });
     },
     function(userId, callbackLocal) {
-      db.query('SELECT * FROM `apps` WHERE `id` = ?', [event.appId], function (err, result) {
+      db.getApp(event.appId, function (err) {
         if (err) return callbackLocal(err);
-
-        if (result.length == 0) {
-          return callbackLocal(Error('App ' + event.appId + ' does not exist'));
-        }
 
         return callbackLocal();
       });
     },
     function (callbackLocal) {
-      db.query('UPDATE apps SET ? WHERE id=?', [event.body, event.appId], function (err) {
+      db.update('apps', event.body, event.appId, function (err) {
         if (err) return callbackLocal(err);
 
         return callbackLocal();
@@ -79,19 +66,10 @@ module.exports.handler = vandium(function(event, context, callback) {
   ], function (err) {
     if (err) return dbCloseCallback(err);
 
-    db.query('SELECT * FROM `apps` WHERE `id` = ?', [event.appId], function (err, result) {
+    db.getApp(event.appId, function (err, result) {
       if (err) return dbCloseCallback(err);
 
-      delete result[0].user_id;
-      result[0].encryption = result[0].encryption == 1;
-      result[0].default_bucket = result[0].default_bucket == 1;
-      result[0].forward_token = result[0].forward_token == 1;
-      result[0].ui_options = result[0].ui_options ? result[0].ui_options : [];
-      result[0].actions = result[0].actions ? result[0].actions : [];
-      result[0].fees = result[0].fees == 1;
-      result[0].is_approved = result[0].is_approved == 1;
-
-      return dbCloseCallback(null, result[0]);
+      return dbCloseCallback(null, result);
     });
   });
 });

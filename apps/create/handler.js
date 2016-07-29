@@ -2,15 +2,7 @@
 
 var jwt = require('../../lib/jwt');
 var async = require('async');
-
-var mysql = require('mysql');
-var db = mysql.createPool({
-  host: process.env.RDS_HOST,
-  user: process.env.RDS_USER,
-  password: process.env.RDS_PASSWORD,
-  database: process.env.RDS_DATABASE,
-  ssl: "Amazon RDS"
-});
+var db = require('../../lib/db');
 
 var CognitoHelper = require('../../lib/cognito-helper/cognito-helper');
 var cognito = new CognitoHelper({
@@ -26,7 +18,6 @@ var cognito = new CognitoHelper({
 });
 
 var vandium = require('vandium');
-
 vandium.validation({
   body: vandium.types.object().keys({
     id: vandium.types.string().min(3).max(50).regex(/^[a-zA-Z0-9-_]+$/).required(),
@@ -81,18 +72,14 @@ module.exports.handler = vandium(function(event, context, callback) {
         params.vendor_id = vendor;
         params.id = vendor + '.' + params.id;
 
-        db.query('SELECT * FROM `apps` WHERE `id` = ?', [params.id], function (err, result) {
+        db.checkAppNotExists(params.id, function (err) {
           if (err) return callbackLocal(err);
-
-          if (result.length != 0) {
-            return callbackLocal(Error('App ' + params.id + ' already exists'));
-          }
 
           return callbackLocal();
         });
       },
       function (callbackLocal) {
-        db.query('INSERT INTO apps SET ?', params, function (err) {
+        db.insert('apps', params, function (err) {
           if (err) return callbackLocal(err);
 
           return callbackLocal();
@@ -101,19 +88,10 @@ module.exports.handler = vandium(function(event, context, callback) {
     ], function (err) {
       if (err) return dbCloseCallback(err);
 
-      db.query('SELECT * FROM `apps` WHERE `id` = ?', [event.appId], function (err, result) {
+      db.getApp(params.id, function (err, result) {
         if (err) return dbCloseCallback(err);
 
-        delete result[0].user_id;
-        result[0].encryption = result[0].encryption == 1;
-        result[0].default_bucket = result[0].default_bucket == 1;
-        result[0].forward_token = result[0].forward_token == 1;
-        result[0].ui_options = result[0].ui_options ? result[0].ui_options : [];
-        result[0].actions = result[0].actions ? result[0].actions : [];
-        result[0].fees = result[0].fees == 1;
-        result[0].is_approved = result[0].is_approved == 1;
-
-        return dbCloseCallback(null, result[0]);
+        return dbCloseCallback(null, result);
       });
     });
   });

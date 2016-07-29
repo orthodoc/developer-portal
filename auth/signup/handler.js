@@ -15,14 +15,7 @@ var cognito = new CognitoHelper({
   COGNITO_PASSWORD_RESET_SOURCE: process.env.COGNITO_PASSWORD_RESET_SOURCE || 'Password reset <noreply@yourdomain.com>'
 });
 
-var mysql = require('mysql');
-var db = mysql.createPool({
-  host: process.env.RDS_HOST,
-  user: process.env.RDS_USER,
-  password: process.env.RDS_PASSWORD,
-  database: process.env.RDS_DATABASE,
-  ssl: "Amazon RDS"
-});
+var db = require('../../lib/db');
 
 var vandium = require('vandium');
 
@@ -67,12 +60,8 @@ module.exports.handler = vandium(function (event, context, callback) {
     return callback(err, result);
   };
 
-  db.query('SELECT * FROM `vendors` WHERE `id` = ?', [event.vendor], function (err, result) {
+  db.getVendor(event.vendor, function (err) {
     if (err) return dbCloseCallback(err);
-
-    if (result.length == 0) {
-      return dbCloseCallback(Error('Vendor ' + event.vendor + ' does not exist'));
-    }
 
     cognito.signup(event.name, event.email, event.password, event.vendor, tokenCallback);
   });

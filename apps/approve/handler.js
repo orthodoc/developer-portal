@@ -4,16 +4,7 @@ var jwt = require('../../lib/jwt');
 var async = require('async');
 var aws = require('aws-sdk');
 var request = require('request');
-
-var mysql = require('mysql');
-var db = mysql.createPool({
-  host: process.env.RDS_HOST,
-  user: process.env.RDS_USER,
-  password: process.env.RDS_PASSWORD,
-  database: process.env.RDS_DATABASE,
-  ssl: "Amazon RDS"
-});
-
+var db = require('../../lib/db');
 var vandium = require('vandium');
 
 vandium.validation({
@@ -37,14 +28,10 @@ module.exports.handler = vandium(function(event, context, callback) {
       });
     },
     function(userId, callbackLocal) {
-      db.query('SELECT * FROM `apps` WHERE `id` = ?', [event.appId], function (err, result) {
+      db.getApp(event.appId, function (err, result) {
         if (err) return callbackLocal(err);
 
-        if (result.length == 0) {
-          return callbackLocal(Error('App ' + event.appId + ' does not exist'));
-        }
-
-        return callbackLocal(null, result[0]);
+        return callbackLocal(null, result);
       });
     },
     function (app, callbackLocal) {
