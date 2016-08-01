@@ -1,3 +1,6 @@
+'use strict';
+
+var async = require('async');
 var aws = require('aws-sdk');
 var jwt = require('../../lib/jwt');
 var response = require('../../lib/response');
@@ -27,11 +30,25 @@ vandium.validation({
 });
 
 module.exports.handler = vandium(function (event, context, callback) {
-  var tokenCallback = function (err, data) {
-    if (err) {
-      dbCloseCallback(response.makeError(err), data);
-    }
-    else {
+
+  var dbCloseCallback = function(err, result) {
+    db.end();
+    return callback(response.makeError(err), result);
+  };
+
+  db.connect();
+  async.waterfall([
+    function (callbackLocal) {
+      db.getVendor(event.vendor, function (err) {
+        return callbackLocal(err);
+      });
+    },
+    function(callbackLocal) {
+      cognito.signup(event.name, event.email, event.password, event.vendor, function (err) {
+        return callbackLocal(err);
+      });
+    },
+    function (callbackLocal) {
       delete event.password;
       var ses = new aws.SES({apiVersion: '2010-12-01', region: process.env.SERVERLESS_REGION});
       ses.sendEmail({
@@ -48,21 +65,10 @@ module.exports.handler = vandium(function (event, context, callback) {
           }
         }
       }, function(err) {
-        if(err) return dbCloseCallback(err);
-
-        return dbCloseCallback();
+        return callbackLocal(err);
       });
     }
-  };
-
-  var dbCloseCallback = function(err, result) {
-    db.end();
-    return callback(err, result);
-  };
-
-  db.getVendor(event.vendor, function (err) {
-    if (err) return dbCloseCallback(err);
-
-    cognito.signup(event.name, event.email, event.password, event.vendor, tokenCallback);
+  ], function (err) {
+    return dbCloseCallback(err);
   });
 });

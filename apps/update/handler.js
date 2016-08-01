@@ -1,10 +1,11 @@
 'use strict';
 
-var jwt = require('../../lib/jwt');
 var async = require('async');
 var db = require('../../lib/db');
-var vandium = require('vandium');
+var jwt = require('../../lib/jwt');
+var response = require('../../lib/response');
 
+var vandium = require('vandium');
 vandium.validation({
   body: vandium.types.object().keys({
     name: vandium.types.string(),
@@ -38,9 +39,10 @@ module.exports.handler = vandium(function(event, context, callback) {
 
   var dbCloseCallback = function(err, result) {
     db.end();
-    return callback(err, result);
+    return callback(response.makeError(err), result);
   };
 
+  db.connect();
   async.waterfall([
     function (callbackLocal) {
       jwt.authenticate(event.jwt, function (err, userId) {
@@ -67,9 +69,7 @@ module.exports.handler = vandium(function(event, context, callback) {
     if (err) return dbCloseCallback(err);
 
     db.getApp(event.appId, function (err, result) {
-      if (err) return dbCloseCallback(err);
-
-      return dbCloseCallback(null, result);
+      return dbCloseCallback(err, result);
     });
   });
 });

@@ -1,8 +1,9 @@
 'use strict';
 
-var jwt = require('../../lib/jwt');
 var async = require('async');
 var db = require('../../lib/db');
+var jwt = require('../../lib/jwt');
+var response = require('../../lib/response');
 
 var CognitoHelper = require('../../lib/cognito-helper/cognito-helper');
 var cognito = new CognitoHelper({
@@ -52,47 +53,43 @@ module.exports.handler = vandium(function(event, context, callback) {
 
   var dbCloseCallback = function(err, result) {
     db.end();
-    return callback(err, result);
+    return callback(response.makeError(err), result);
   };
 
-  jwt.authenticate(event.jwt, function (err, userId) {
+  db.connect();
+  async.waterfall([
+    function (callbackLocal) {
+      jwt.authenticate(event.jwt, function (err, userId) {
+        if (err) return callbackLocal(err);
+        params.user_id = userId;
+        return callbackLocal(null, userId);
+      });
+    },
+    function (userId, callbackLocal) {
+      cognito.getProfile(userId, function (err, result) {
+        if (err) return callbackLocal(err);
+
+        return callbackLocal(null, result.vendor);
+      });
+    },
+    function (vendor, callbackLocal) {
+      params.vendor_id = vendor;
+      params.id = vendor + '.' + params.id;
+
+      db.checkAppNotExists(params.id, function (err) {
+        return callbackLocal(err);
+      });
+    },
+    function (callbackLocal) {
+      db.insert('apps', params, function (err) {
+        return callbackLocal(err);
+      });
+    }
+  ], function (err) {
     if (err) return dbCloseCallback(err);
 
-    params.user_id = userId;
-
-    async.waterfall([
-      function (callbackLocal) {
-        cognito.getProfile(userId, function (err, result) {
-          if (err) return callbackLocal(err);
-
-          return callbackLocal(null, result.vendor);
-        });
-      },
-      function (vendor, callbackLocal) {
-        params.vendor_id = vendor;
-        params.id = vendor + '.' + params.id;
-
-        db.checkAppNotExists(params.id, function (err) {
-          if (err) return callbackLocal(err);
-
-          return callbackLocal();
-        });
-      },
-      function (callbackLocal) {
-        db.insert('apps', params, function (err) {
-          if (err) return callbackLocal(err);
-
-          return callbackLocal();
-        });
-      }
-    ], function (err) {
-      if (err) return dbCloseCallback(err);
-
-      db.getApp(params.id, function (err, result) {
-        if (err) return dbCloseCallback(err);
-
-        return dbCloseCallback(null, result);
-      });
+    db.getApp(params.id, function (err, result) {
+      return dbCloseCallback(err, result);
     });
   });
 });
