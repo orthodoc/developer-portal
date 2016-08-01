@@ -5,6 +5,7 @@ var aws = require('aws-sdk');
 var db = require('../../lib/db');
 var jwt = require('../../lib/jwt');
 var request = require('request');
+var response = require('../../lib/response');
 
 var vandium = require('vandium');
 vandium.validation({
