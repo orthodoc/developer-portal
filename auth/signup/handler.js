@@ -23,10 +23,13 @@ var db = require('../../lib/db');
 var vandium = require('vandium');
 
 vandium.validation({
-  name: vandium.types.string().required(),
-  email: vandium.types.email().required(),
-  password: vandium.types.string().required().min(8),
-  vendor: vandium.types.string().required()
+  name: vandium.types.string().required().error(new Error("Parameter name is required")),
+  email: vandium.types.email().required().error(new Error("Parameter email is required")),
+  password: vandium.types.string().required().min(8)
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}/)
+    .error(new Error("Parameter password is required, must have at least 8 characters and contain at least one "
+      + "lowercase letter, one uppercase letter, one number and one special character")),
+  vendor: vandium.types.string().required().error(new Error("Parameter vendor is required"))
 });
 
 module.exports.handler = vandium(function (event, context, callback) {

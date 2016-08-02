@@ -30,8 +30,8 @@ var customCognito = new CustomCognitoHelper({
 var vandium = require('vandium');
 
 vandium.validation({
-  email: vandium.types.email().required(),
-  password: vandium.types.string().required(),
+  email: vandium.types.email().required().error(new Error("Parameter email is required")),
+  password: vandium.types.string().required().error(new Error("Parameter password is required")),
   reset: vandium.types.string()
 });
 

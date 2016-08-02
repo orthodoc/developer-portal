@@ -10,7 +10,7 @@ var response = require('../../lib/response');
 var vandium = require('vandium');
 vandium.validation({
   jwt: vandium.types.string(),
-  appId: vandium.types.string().required(),
+  appId: vandium.types.string().required().error(new Error("Parameter appId is required")),
   body: vandium.types.object()
 });
 
