@@ -23,11 +23,9 @@
             ]
         },
         "cognitoUserIdentityPool": {
-            "AliasAttributes": [
-                "email"
-            ],
+            "AliasAttributes": [],
             "EmailVerificationMessage": "{####}",
-            "EmailVerificationSubject": "Email Verification Subject",
+            "EmailVerificationSubject": "Verification of Keboola Developer Portal account",
             "SmsAuthenticationMessage": "{####}",
             "SmsVerificationMessage": "{####}",
             "LambdaConfig": {},
@@ -35,10 +33,10 @@
             "Policies": {
                 "PasswordPolicy": {
                     "MinimumLength": 8,
-                    "RequireLowercase": false,
-                    "RequireNumbers": false,
-                    "RequireSymbols": false,
-                    "RequireUppercase": false
+                    "RequireLowercase": true,
+                    "RequireNumbers": true,
+                    "RequireSymbols": true,
+                    "RequireUppercase": true
                 }
             },
             "PoolName": "${project}-${stage}",
@@ -58,7 +56,7 @@
                     "AttributeDataType": "Number",
                     "DeveloperOnlyAttribute": true,
                     "Mutable": true,
-                    "Name": "Approved",
+                    "Name": "is_approved",
                     "Required": true,
                     "Default": "0",
                     "NumberAttributeConstraints": {
@@ -71,9 +69,7 @@
         }
     },
     "plugins": [
-        "serverless-serve",
         "serverless-cors-plugin",
-        "serverless-cognito-manager",
-        "serverless-optimizer-plugin"
+        "serverless-cognito-manager"
     ]
 }
