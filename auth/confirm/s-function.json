@@ -1,0 +1,53 @@
+{
+    "name": "auth-confirm",
+    "runtime": "nodejs4.3",
+    "description": "Serverless Lambda function for project: keboola-developer-portal",
+    "customName": false,
+    "customRole": false,
+    "handler": "auth/confirm/handler.handler",
+    "timeout": 30,
+    "memorySize": 1024,
+    "authorizer": {},
+    "custom": {
+        "cors": {
+            "allowOrigin": "*",
+            "allowHeaders": ["Content-Type", "X-Amz-Date", "Authorization", "X-Api-Key"]
+        }
+    },
+    "endpoints": [
+        {
+            "path": "auth/confirm/{email}/{code}",
+            "method": "GET",
+            "type": "AWS",
+            "authorizationType": "none",
+            "authorizerFunction": false,
+            "apiKeyRequired": false,
+            "requestParameters": {},
+            "requestTemplates": {
+                "application/json": "{\"email\": \"$input.params('email')\", \"code\": \"$input.params('code')\"}"
+            },
+            "responses": "$${endpointResponsesTemplate}"
+        }
+    ],
+    "events": [],
+    "environment": {
+        "SERVERLESS_PROJECT": "${project}",
+        "SERVERLESS_STAGE": "${stage}",
+        "SERVERLESS_REGION": "${region}",
+        "AWS_ACCOUNT_ID": "${awsAccountId}",
+        "COGNITO_IDENTITY_POOL_ID": "${cognitoIdentityPoolId}",
+        "COGNITO_DEVELOPER_PROVIDER_NAME": "${cognitoDeveloperProviderName}",
+        "COGNITO_USER_IDENTITY_POOL_ID": "${cognitoUserIdentityPoolId}",
+        "COGNITO_USER_IDENTITY_POOL_CLIENT_ID": "${cognitoUserIdentityPoolClientId}",
+        "JWT_SECRET": "${jwtSecret}",
+        "RDS_HOST": "${rdsHost}",
+        "RDS_USER": "${rdsUser}",
+        "RDS_PASSWORD": "${rdsPassword}",
+        "RDS_DATABASE": "${rdsDatabase}",
+        "SES_EMAIL": "${sesEmail}"
+    },
+    "vpc": {
+        "securityGroupIds": [],
+        "subnetIds": []
+    }
+}

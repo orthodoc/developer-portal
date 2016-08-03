@@ -1,3 +1,5 @@
+'use strict';
+
 var jwt = require('../../lib/jwt');
 var response = require('../../lib/response');
 
