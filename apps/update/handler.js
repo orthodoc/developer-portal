@@ -8,7 +8,7 @@ var response = require('../../lib/response');
 var vandium = require('vandium');
 vandium.validation({
   body: vandium.types.object().keys({
-    name: vandium.types.string().required().error(new Error("Parameter name must be string")),
+    name: vandium.types.string().error(new Error("Parameter name must be string")),
     type: vandium.types.string().valid('reader', 'application', 'writer')
       .error(new Error("Parameter type must be one of: reader, writer, application")),
     image_url: vandium.types.string().uri().error(new Error("Parameter image_url must be url")),
@@ -64,7 +64,7 @@ module.exports.handler = vandium(function(event, context, callback) {
       });
     },
     function (callbackLocal) {
-      db.update('apps', event.body, event.appId, function (err) {
+      db.updateApp(event.body, event.appId, function (err) {
         if (err) return callbackLocal(err);
 
         return callbackLocal();

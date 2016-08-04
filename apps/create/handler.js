@@ -88,7 +88,7 @@ module.exports.handler = vandium(function(event, context, callback) {
       });
     },
     function (callbackLocal) {
-      db.insert('apps', params, function (err) {
+      db.insertApp(params, function (err) {
         return callbackLocal(err);
       });
     }

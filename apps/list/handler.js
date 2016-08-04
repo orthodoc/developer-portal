@@ -13,7 +13,7 @@ module.exports.handler = vandium(function(event, context, callback) {
   };
 
   db.connect();
-  db.listApps(function (err, result) {
+  db.listAllApprovedApps(function (err, result) {
     return dbCloseCallback(err, result);
   })
 });
