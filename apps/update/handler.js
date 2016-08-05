@@ -49,28 +49,26 @@ module.exports.handler = vandium(function(event, context, callback) {
 
   db.connect();
   async.waterfall([
-    function (callbackLocal) {
-      jwt.authenticate(event.jwt, function (err, userId) {
-        if (err) return callbackLocal(err);
-
-        return callbackLocal(null, userId);
+    function(callbackLocal) {
+      jwt.authenticate(event.jwt, function(err, userId) {
+        return callbackLocal(err, userId);
       });
     },
     function(userId, callbackLocal) {
-      db.getApp(event.appId, function (err) {
+      db.getApp(event.appId, function(err) {
         if (err) return callbackLocal(err);
 
         return callbackLocal();
       });
     },
-    function (callbackLocal) {
-      db.updateApp(event.body, event.appId, function (err) {
+    function(callbackLocal) {
+      db.updateApp(event.body, event.appId, function(err) {
         if (err) return callbackLocal(err);
 
         return callbackLocal();
       });
     }
-  ], function (err) {
+  ], function(err) {
     if (err) return dbCloseCallback(err);
 
     db.getApp(event.appId, function (err, result) {
