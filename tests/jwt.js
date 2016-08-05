@@ -1,7 +1,7 @@
+require('dotenv').load();
+
 var vows = require('vows');
 var assert = require('assert');
-
-process.env.TOKEN_SECRET = 'dkgjskljgsljfjkgd';
 
 var jwt = require('../lib/jwt');
 var jwtSimple = require('jwt-simple');
