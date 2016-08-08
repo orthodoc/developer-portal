@@ -39,7 +39,8 @@
     "RDS_USER": "${rdsUser}",
     "RDS_PASSWORD": "${rdsPassword}",
     "RDS_DATABASE": "${rdsDatabase}",
-    "SES_EMAIL": "${sesEmail}"
+    "SES_EMAIL": "${sesEmail}",
+    "S3_BUCKET": "${s3Bucket}"
   },
   "vpc": {
     "securityGroupIds": [],

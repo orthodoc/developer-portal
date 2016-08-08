@@ -2,7 +2,6 @@
 
 var async = require('async');
 var aws = require('aws-sdk');
-var jwt = require('../../lib/jwt');
 var response = require('../../lib/response');
 
 var CognitoHelper = require('../../lib/cognito-helper/cognito-helper');
@@ -23,35 +22,34 @@ var db = require('../../lib/db');
 var vandium = require('vandium');
 
 vandium.validation({
-  name: vandium.types.string().required().error(new Error("Parameter name is required")),
-  email: vandium.types.email().required().error(new Error("Parameter email is required")),
+  name: vandium.types.string().required().error(new Error('Parameter name is required')),
+  email: vandium.types.email().required().error(new Error('Parameter email is required')),
   password: vandium.types.string().required().min(8)
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}/)
-    .error(new Error("Parameter password is required, must have at least 8 characters and contain at least one "
-      + "lowercase letter, one uppercase letter, one number and one special character")),
-  vendor: vandium.types.string().required().error(new Error("Parameter vendor is required"))
+    .error(new Error('Parameter password is required, must have at least 8 characters and contain at least one '
+      + 'lowercase letter, one uppercase letter, one number and one special character')),
+  vendor: vandium.types.string().required().error(new Error('Parameter vendor is required'))
 });
 
-module.exports.handler = vandium(function (event, context, callback) {
-
-  var dbCloseCallback = function(err, result) {
+module.exports.handler = vandium(function(event, context, callback) {
+  var mainCallback = function(err, result) {
     db.end();
     return callback(response.makeError(err), result);
   };
 
   db.connect();
   async.waterfall([
-    function (callbackLocal) {
-      db.getVendor(event.vendor, function (err) {
+    function(callbackLocal) {
+      db.getVendor(event.vendor, function(err) {
         return callbackLocal(err);
       });
     },
     function(callbackLocal) {
-      cognito.signup(event.name, event.email, event.password, event.vendor, function (err) {
+      cognito.signup(event.name, event.email, event.password, event.vendor, function(err) {
         return callbackLocal(err);
       });
     },
-    function (callbackLocal) {
+    function(callbackLocal) {
       delete event.password;
       var ses = new aws.SES({apiVersion: '2010-12-01', region: process.env.SERVERLESS_REGION});
       ses.sendEmail({
@@ -71,7 +69,7 @@ module.exports.handler = vandium(function (event, context, callback) {
         return callbackLocal(err);
       });
     }
-  ], function (err) {
-    return dbCloseCallback(err);
+  ], function(err) {
+    return mainCallback(err);
   });
 });
