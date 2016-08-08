@@ -50,28 +50,30 @@ module.exports.handler = vandium(function(event, context, callback) {
       async.parallel([
         function(callbackLocal2) {
           var s3 = new aws.S3();
-          s3.headObject({ Bucket: process.env.S3_BUCKET, Key: app.id + '-32.png' }, function(err, data) {
+          s3.headObject({ Bucket: process.env.S3_BUCKET, Key: app.id + '-32.png' }, function(err) {
             if (err) {
               if (err.code === 'Forbidden') {
                 return callbackLocal(Error('App icon of size 32px does not exist in s3 storage, upload it first.'));
               } else {
                 return callbackLocal2(err);
               }
-            } else
+            } else {
               return callbackLocal2();
+            }
           });
         },
         function(callbackLocal2) {
           var s3 = new aws.S3();
-          s3.headObject({ Bucket: process.env.S3_BUCKET, Key: app.id + '-64.png' }, function(err, data) {
+          s3.headObject({ Bucket: process.env.S3_BUCKET, Key: app.id + '-64.png' }, function(err) {
             if (err) {
               if (err.code === 'Forbidden') {
                 return callbackLocal(Error('App icon of size 64px does not exist in s3 storage, upload it first.'));
               } else {
                 return callbackLocal2(err);
               }
-            } else
+            } else {
               return callbackLocal2();
+            }
           });
         }
       ], function(err) {
@@ -125,8 +127,8 @@ module.exports.handler = vandium(function(event, context, callback) {
           }
         }
       }
-    }, function(err) {
-      return dbCloseCallback(err);
+    }, function(errLocal) {
+      return dbCloseCallback(errLocal);
     });
   });
 });

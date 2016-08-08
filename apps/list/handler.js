@@ -1,10 +1,10 @@
 'use strict';
 
 var async = require('async');
+var vandium = require('vandium');
+
 var db = require('../../lib/db');
 var response = require('../../lib/response');
-
-var vandium = require('vandium');
 
 module.exports.handler = vandium(function(event, context, callback) {
   var dbCloseCallback = function(err, result) {
@@ -13,7 +13,7 @@ module.exports.handler = vandium(function(event, context, callback) {
   };
 
   db.connect();
-  db.listAllApprovedApps(function (err, result) {
+  db.listAllApprovedApps(function(err, result) {
     return dbCloseCallback(err, result);
-  })
+  });
 });
