@@ -1,3 +1,10 @@
 language: node_js
+
 node_js:
   - "4.3"
+
+services:
+  - mysql
+
+before_script:
+  - mysql -e 'create database dev_portal_test;'

@@ -35,5 +35,7 @@
     "serverless-mocha-plugin": "^0.5.15",
     "chai": "^3.5.0"
   },
-  "scripts": {}
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha --timeout 0"
+  }
 }
