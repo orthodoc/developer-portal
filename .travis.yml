@@ -6,5 +6,8 @@ node_js:
 services:
   - mysql
 
+install:
+  - npm install mocha
+
 before_script:
   - mysql -e 'create database dev_portal_test;'
