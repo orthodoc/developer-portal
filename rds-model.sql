@@ -1,3 +1,6 @@
+SET foreign_key_checks = 0;
+
+DROP TABLE IF EXISTS vendors;
 CREATE TABLE `vendors` (
   `id` varchar(50) NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -6,6 +9,7 @@ CREATE TABLE `vendors` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS apps;
 CREATE TABLE `apps` (
   `id` varchar(50) NOT NULL,
   `vendor_id` varchar(50) NOT NULL,
@@ -39,6 +43,7 @@ CREATE TABLE `apps` (
   CONSTRAINT `apps_ibfk_1` FOREIGN KEY (`vendor_id`) REFERENCES `vendors` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS app_versions;
 CREATE TABLE `app_versions` (
   `app_id` varchar(50) NOT NULL,
   `version` varchar(50) NOT NULL,
@@ -70,3 +75,5 @@ CREATE TABLE `app_versions` (
   PRIMARY KEY (`app_id`,`version`),
   CONSTRAINT `app_versions_ibfk_1` FOREIGN KEY (`app_id`) REFERENCES `apps` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+SET foreign_key_checks = 1;

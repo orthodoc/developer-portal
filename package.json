@@ -27,12 +27,13 @@
     "randomstring": "^1.0.6",
     "request": "^2.74.0",
     "string-format": "^0.5.0",
-    "vandium": "^2.7.1"
+    "vandium": "^3.0.0"
   },
   "devDependencies": {
     "serverless-cognito-manager": "^1.2.0",
     "serverless-cors-plugin": "^0.4.1",
-    "vows": "^0.8.1"
+    "serverless-mocha-plugin": "^0.5.15",
+    "chai": "^3.5.0"
   },
   "scripts": {}
 }

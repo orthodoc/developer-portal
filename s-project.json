@@ -1,75 +1,76 @@
 {
-    "name": "keboola-developer-portal",
-    "custom": {
-        "cognitoIdentityPool": {
-            "AllowUnauthenticatedIdentities": false,
-            "CognitoIdentityProviders": [
-                {
-                    "ClientId": "${cognitoUserIdentityPoolClientId}",
-                    "ProviderName": "cognito-idp.${region}.amazonaws.com/${cognitoUserIdentityPoolId}"
-                }
-            ],
-            "SupportedLoginProviders": {
-                "string": "string"
-            },
-            "IdentityPoolName": "${project} ${stage}",
-            "Roles": {
-                "authenticated": "${cognitoAuthenticatedRole}",
-                "unauthenticated": "${cognitoUnauthenticatedRole}"
-            },
-            "DeveloperProviderName": "string",
-            "OpenIdConnectProviderARNs": [
-                "arn:aws:cognito-idp.${region}.amazonaws.com/${cognitoUserIdentityPoolId}"
-            ]
-        },
-        "cognitoUserIdentityPool": {
-            "AliasAttributes": [],
-            "EmailVerificationMessage": "{####}",
-            "EmailVerificationSubject": "Verification of Keboola Developer Portal account",
-            "SmsAuthenticationMessage": "{####}",
-            "SmsVerificationMessage": "{####}",
-            "LambdaConfig": {},
-            "MfaConfiguration": "OFF",
-            "Policies": {
-                "PasswordPolicy": {
-                    "MinimumLength": 8,
-                    "RequireLowercase": true,
-                    "RequireNumbers": true,
-                    "RequireSymbols": true,
-                    "RequireUppercase": true
-                }
-            },
-            "PoolName": "${project}-${stage}",
-            "CustomAttributes": [
-                {
-                    "AttributeDataType": "String",
-                    "DeveloperOnlyAttribute": false,
-                    "Mutable": true,
-                    "Name": "vendor",
-                    "Required": true,
-                    "StringAttributeConstraints": {
-                        "MaxLength": "50",
-                        "MinLength": "1"
-                    }
-                },
-                {
-                    "AttributeDataType": "Number",
-                    "DeveloperOnlyAttribute": true,
-                    "Mutable": true,
-                    "Name": "is_approved",
-                    "Required": true,
-                    "Default": "0",
-                    "NumberAttributeConstraints": {
-                        "MaxValue": "1",
-                        "MinValue": "0"
-                    }
-                }
-            ],
-            "AutoVerifiedAttributes": []
+  "name": "keboola-developer-portal",
+  "custom": {
+    "cognitoIdentityPool": {
+      "AllowUnauthenticatedIdentities": false,
+      "CognitoIdentityProviders": [
+        {
+          "ClientId": "${cognitoUserIdentityPoolClientId}",
+          "ProviderName": "cognito-idp.${region}.amazonaws.com/${cognitoUserIdentityPoolId}"
         }
+      ],
+      "SupportedLoginProviders": {
+        "string": "string"
+      },
+      "IdentityPoolName": "${project} ${stage}",
+      "Roles": {
+        "authenticated": "${cognitoAuthenticatedRole}",
+        "unauthenticated": "${cognitoUnauthenticatedRole}"
+      },
+      "DeveloperProviderName": "string",
+      "OpenIdConnectProviderARNs": [
+        "arn:aws:cognito-idp.${region}.amazonaws.com/${cognitoUserIdentityPoolId}"
+      ]
     },
-    "plugins": [
-        "serverless-cors-plugin",
-        "serverless-cognito-manager"
-    ]
+    "cognitoUserIdentityPool": {
+      "AliasAttributes": [],
+      "EmailVerificationMessage": "{####}",
+      "EmailVerificationSubject": "Verification of Keboola Developer Portal account",
+      "SmsAuthenticationMessage": "{####}",
+      "SmsVerificationMessage": "{####}",
+      "LambdaConfig": {},
+      "MfaConfiguration": "OFF",
+      "Policies": {
+        "PasswordPolicy": {
+          "MinimumLength": 8,
+          "RequireLowercase": true,
+          "RequireNumbers": true,
+          "RequireSymbols": true,
+          "RequireUppercase": true
+        }
+      },
+      "PoolName": "${project}-${stage}",
+      "CustomAttributes": [
+        {
+          "AttributeDataType": "String",
+          "DeveloperOnlyAttribute": false,
+          "Mutable": true,
+          "Name": "vendor",
+          "Required": true,
+          "StringAttributeConstraints": {
+            "MaxLength": "50",
+            "MinLength": "1"
+          }
+        },
+        {
+          "AttributeDataType": "Number",
+          "DeveloperOnlyAttribute": true,
+          "Mutable": true,
+          "Name": "is_approved",
+          "Required": true,
+          "Default": "0",
+          "NumberAttributeConstraints": {
+            "MaxValue": "1",
+            "MinValue": "0"
+          }
+        }
+      ],
+      "AutoVerifiedAttributes": []
+    }
+  },
+  "plugins": [
+    "serverless-cors-plugin",
+    "serverless-cognito-manager",
+    "serverless-mocha-plugin"
+  ]
 }
