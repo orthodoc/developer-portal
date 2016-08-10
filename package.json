@@ -27,6 +27,7 @@
     "randomstring": "^1.0.6",
     "request": "^2.74.0",
     "string-format": "^0.5.0",
+    "underscore": "^1.8.3",
     "vandium": "^3.0.0"
   },
   "devDependencies": {
