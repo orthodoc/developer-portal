@@ -16,7 +16,7 @@ describe('db', function() {
       user: process.env.RDS_USER,
       password: process.env.RDS_PASSWORD,
       database: process.env.RDS_DATABASE,
-      ssl: 'Amazon RDS',
+      ssl: process.env.RDS_SSL ? 'Amazon RDS' : false,
       multipleStatements: true
     });
     execsql.execFile(rds, __dirname + '/../rds-model.sql', function(err, res) {
