@@ -37,6 +37,8 @@
         "AWS_ACCOUNT_ID": "${awsAccountId}",
         "COGNITO_IDENTITY_POOL_ID": "${cognitoIdentityPoolId}",
         "COGNITO_DEVELOPER_PROVIDER_NAME": "${cognitoDeveloperProviderName}",
+        "COGNITO_USER_IDENTITY_POOL_ID": "${cognitoUserIdentityPoolId}",
+        "COGNITO_USER_IDENTITY_POOL_CLIENT_ID": "${cognitoUserIdentityPoolClientId}",
         "JWT_SECRET": "${jwtSecret}"
     },
     "vpc": {
