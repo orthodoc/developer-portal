@@ -5,6 +5,7 @@ var db;
 
 var formatAppOutput = function(app) {
   delete app.user_id;
+  delete app.user_email;
   app.encryption = app.encryption === 1;
   app.default_bucket = app.default_bucket === 1;
   app.forward_token = app.forward_token === 1;

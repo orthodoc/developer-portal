@@ -4,7 +4,7 @@
   "description": "Serverless Lambda function for project: keboola-developer-portal",
   "customName": false,
   "customRole": false,
-  "handler": "apps/approve/handler.handler",
+  "handler": "approve/handler.handler",
   "timeout": 30,
   "memorySize": 1024,
   "authorizer": {},
@@ -16,31 +16,25 @@
       "path": "apps/{appId}/approve",
       "method": "POST",
       "type": "AWS",
-      "authorizationType": "none",
-      "authorizerFunction": false,
+      "authorizationType": "custom",
+      "authorizerFunction": "authorizer",
       "apiKeyRequired": false,
       "requestParameters": {},
       "requestTemplates": {
-        "application/json": "{\"jwt\":\"$input.params().header.get('Authorization')\", \"body\":$input.json('$'), \"appId\": \"$input.params('appId')\"}"
+        "application/json": "{\"token\":\"$input.params().header.get('Authorization')\", \"body\":$input.json('$'), \"appId\": \"$input.params('appId')\"}"
       },
       "responses": "$${endpointResponsesTemplate}"
     }
   ],
   "events": [],
   "environment": {
-    "SERVERLESS_PROJECT": "${project}",
-    "SERVERLESS_STAGE": "${stage}",
-    "SERVERLESS_REGION": "${region}",
-    "AWS_ACCOUNT_ID": "${awsAccountId}",
-    "COGNITO_IDENTITY_POOL_ID": "${cognitoIdentityPoolId}",
-    "COGNITO_DEVELOPER_PROVIDER_NAME": "${cognitoDeveloperProviderName}",
-    "JWT_SECRET": "${jwtSecret}",
+    "REGION": "${region}",
     "RDS_HOST": "${rdsHost}",
     "RDS_USER": "${rdsUser}",
     "RDS_PASSWORD": "${rdsPassword}",
     "RDS_DATABASE": "${rdsDatabase}",
     "SES_EMAIL": "${sesEmail}",
-    "S3_BUCKET": "${s3Bucket}"
+    "S3_BUCKET_ICONS": "${s3Bucket}"
   },
   "vpc": {
     "securityGroupIds": [],

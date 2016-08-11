@@ -1,24 +1,9 @@
 'use strict';
-
 var async = require('async');
-var db = require('../../lib/db');
-var jwt = require('../../lib/jwt');
-var response = require('../../lib/response');
-
-var CognitoHelper = require('../../lib/cognito-helper/cognito-helper');
-var cognito = new CognitoHelper({
-  AWS_ACCOUNT_ID: process.env.AWS_ACCOUNT_ID,
-  COGNITO_IDENTITY_POOL_ID: process.env.COGNITO_IDENTITY_POOL_ID,
-  COGNITO_DEVELOPER_PROVIDER_NAME: process.env.COGNITO_DEVELOPER_PROVIDER_NAME,
-  COGNITO_SEPARATOR: process.env.COGNITO_SEPARATOR || '----',
-  COGNITO_DATASET_NAME: process.env.COGNITO_DATASET_NAME || 'profile',
-  COGNITO_PASSWORD_RESET_URL: process.env.COGNITO_PASSWORD_RESET_URL || 'http://localhost:8100/app.html#/reset/{email}/{reset}',
-  COGNITO_PASSWORD_RESET_BODY: process.env.COGNITO_PASSWORD_RESET_BODY || 'Dear {name}, please follow the link below to reset your password:',
-  COGNITO_PASSWORD_RESET_SUBJECT: process.env.COGNITO_PASSWORD_RESET_SUBJECT || 'Password reset',
-  COGNITO_PASSWORD_RESET_SOURCE: process.env.COGNITO_PASSWORD_RESET_SOURCE || 'Password reset <noreply@yourdomain.com>'
-});
-
+var db = require('../db');
+var identity = require('../identity');
 var vandium = require('vandium');
+
 vandium.validation({
   body: vandium.types.object().keys({
     id: vandium.types.string().min(3).max(50).regex(/^[a-zA-Z0-9-_]+$/).required()
@@ -52,7 +37,7 @@ vandium.validation({
     logger: vandium.types.string().valid('standard', 'gelf')
       .error(new Error("Parameter logger must be one of: standard, gelf"))
   }),
-  jwt: vandium.types.string()
+  token: vandium.types.string()
 });
 
 module.exports.handler = vandium(function(event, context, callback) {
@@ -60,28 +45,22 @@ module.exports.handler = vandium(function(event, context, callback) {
 
   var dbCloseCallback = function(err, result) {
     db.end();
-    return callback(response.makeError(err), result);
+    return callback(err, result);
   };
 
   db.connect();
   async.waterfall([
     function (callbackLocal) {
-      jwt.authenticate(event.jwt, function (err, userId) {
+      identity.getUser(event.token, function (err, data) {
         if (err) return callbackLocal(err);
-        params.user_id = userId;
-        return callbackLocal(null, userId);
+        params.user_id = data.id;
+        params.user_email = data.email;
+        return callbackLocal(null, data);
       });
     },
-    function (userId, callbackLocal) {
-      cognito.getProfile(userId, function (err, result) {
-        if (err) return callbackLocal(err);
-
-        return callbackLocal(null, result.vendor);
-      });
-    },
-    function (vendor, callbackLocal) {
-      params.vendor_id = vendor;
-      params.id = vendor + '.' + params.id;
+    function (user, callbackLocal) {
+      params.vendor_id = user.vendor;
+      params.id = user.vendor + '.' + params.id;
 
       db.checkAppNotExists(params.id, function (err) {
         return callbackLocal(err);

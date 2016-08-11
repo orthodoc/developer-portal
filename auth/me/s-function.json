@@ -4,7 +4,7 @@
     "description": "Serverless Lambda function for project: keboola-developer-portal",
     "customName": false,
     "customRole": false,
-    "handler": "auth/me/handler.handler",
+    "handler": "me/handler.handler",
     "timeout": 30,
     "memorySize": 1024,
     "authorizer": {},
@@ -19,25 +19,19 @@
             "path": "auth/me",
             "method": "GET",
             "type": "AWS",
-            "authorizationType": "none",
-            "authorizerFunction": false,
+            "authorizationType": "custom",
+            "authorizerFunction": "authorizer",
             "apiKeyRequired": false,
             "requestParameters": {},
             "requestTemplates": {
-                "application/json": "{\"jwt\":\"$input.params().header.get('Authorization')\"}"
+                "application/json": "{\"token\":\"$input.params().header.get('Authorization')\"}"
             },
             "responses": "$${endpointResponsesTemplate}"
         }
     ],
     "events": [],
     "environment": {
-        "SERVERLESS_PROJECT": "${project}",
-        "SERVERLESS_STAGE": "${stage}",
-        "SERVERLESS_REGION": "${region}",
-        "AWS_ACCOUNT_ID": "${awsAccountId}",
-        "COGNITO_IDENTITY_POOL_ID": "${cognitoIdentityPoolId}",
-        "COGNITO_DEVELOPER_PROVIDER_NAME": "${cognitoDeveloperProviderName}",
-        "JWT_SECRET": "${jwtSecret}"
+        "REGION": "${region}"
     },
     "vpc": {
         "securityGroupIds": [],

@@ -1,27 +1,6 @@
 {
   "name": "keboola-developer-portal",
   "custom": {
-    "cognitoIdentityPool": {
-      "AllowUnauthenticatedIdentities": false,
-      "CognitoIdentityProviders": [
-        {
-          "ClientId": "${cognitoUserIdentityPoolClientId}",
-          "ProviderName": "cognito-idp.${region}.amazonaws.com/${cognitoUserIdentityPoolId}"
-        }
-      ],
-      "SupportedLoginProviders": {
-        "string": "string"
-      },
-      "IdentityPoolName": "${project} ${stage}",
-      "Roles": {
-        "authenticated": "${cognitoAuthenticatedRole}",
-        "unauthenticated": "${cognitoUnauthenticatedRole}"
-      },
-      "DeveloperProviderName": "string",
-      "OpenIdConnectProviderARNs": [
-        "arn:aws:cognito-idp.${region}.amazonaws.com/${cognitoUserIdentityPoolId}"
-      ]
-    },
     "cognitoUserIdentityPool": {
       "AliasAttributes": [],
       "EmailVerificationMessage": "{####}",
@@ -40,31 +19,7 @@
         }
       },
       "PoolName": "${project}-${stage}",
-      "CustomAttributes": [
-        {
-          "AttributeDataType": "String",
-          "DeveloperOnlyAttribute": false,
-          "Mutable": true,
-          "Name": "vendor",
-          "Required": true,
-          "StringAttributeConstraints": {
-            "MaxLength": "50",
-            "MinLength": "1"
-          }
-        },
-        {
-          "AttributeDataType": "Number",
-          "DeveloperOnlyAttribute": true,
-          "Mutable": true,
-          "Name": "is_approved",
-          "Required": true,
-          "Default": "0",
-          "NumberAttributeConstraints": {
-            "MaxValue": "1",
-            "MinValue": "0"
-          }
-        }
-      ],
+      "CustomAttributes": [],
       "AutoVerifiedAttributes": []
     }
   },

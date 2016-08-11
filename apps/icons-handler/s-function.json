@@ -4,7 +4,7 @@
   "description": "Serverless Lambda function for project: keboola-developer-portal",
   "customName": false,
   "customRole": false,
-  "handler": "apps/icons-handler/handler.handler",
+  "handler": "icons-handler/handler.handler",
   "timeout": 30,
   "memorySize": 1024,
   "authorizer": {},
@@ -14,18 +14,11 @@
   "endpoints": [],
   "events": [],
   "environment": {
-    "SERVERLESS_PROJECT": "${project}",
-    "SERVERLESS_STAGE": "${stage}",
-    "SERVERLESS_REGION": "${region}",
-    "AWS_ACCOUNT_ID": "${awsAccountId}",
-    "COGNITO_IDENTITY_POOL_ID": "${cognitoIdentityPoolId}",
-    "COGNITO_DEVELOPER_PROVIDER_NAME": "${cognitoDeveloperProviderName}",
-    "JWT_SECRET": "${jwtSecret}",
     "RDS_HOST": "${rdsHost}",
     "RDS_USER": "${rdsUser}",
     "RDS_PASSWORD": "${rdsPassword}",
     "RDS_DATABASE": "${rdsDatabase}",
-    "S3_BUCKET": "${s3Bucket}"
+    "S3_BUCKET_ICONS": "${s3Bucket}"
   },
   "vpc": {
     "securityGroupIds": [],

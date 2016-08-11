@@ -1,11 +1,8 @@
 'use strict';
-
 var async = require('async');
-var db = require('../../lib/db');
-var jwt = require('../../lib/jwt');
-var response = require('../../lib/response');
-
+var db = require('../db');
 var vandium = require('vandium');
+
 vandium.validation({
   body: vandium.types.object().keys({
     name: vandium.types.string().error(Error('Parameter name must be string')),
@@ -36,38 +33,26 @@ vandium.validation({
     logger: vandium.types.string().valid('standard', 'gelf')
       .error(Error('Parameter logger must be one of: standard, gelf'))
   }),
-  jwt: vandium.types.string(),
+  token: vandium.types.string(),
   appId: vandium.types.string().required()
 });
 
 module.exports.handler = vandium(function(event, context, callback) {
   var dbCloseCallback = function(err, result) {
     db.end();
-    return callback(response.makeError(err), result);
+    return callback(err, result);
   };
 
   db.connect();
   async.waterfall([
     function(callbackLocal) {
-      jwt.authenticate(event.jwt, function(err, userId) {
-        return callbackLocal(err, userId);
-      });
+      db.getApp(event.appId, callbackLocal);
     },
-    function(userId, callbackLocal) {
-      db.getApp(event.appId, function(err) {
-        return callbackLocal(err);
-      });
-    },
-    function(callbackLocal) {
-      db.updateApp(event.body, event.appId, function(err) {
-        return callbackLocal(err);
-      });
+    function(data, callbackLocal) {
+      db.updateApp(event.body, event.appId, callbackLocal);
     }
   ], function(err) {
     if (err) return dbCloseCallback(err);
-
-    db.getApp(event.appId, function(errLocal, result) {
-      return dbCloseCallback(errLocal, result);
-    });
+    db.getApp(event.appId, dbCloseCallback);
   });
 });

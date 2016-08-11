@@ -1,0 +1,25 @@
+{
+    "name": "authorizer",
+    "runtime": "nodejs4.3",
+    "description": "Serverless Lambda function for project: keboola-developer-portal",
+    "customName": false,
+    "customRole": false,
+    "handler": "handler.handler",
+    "timeout": 30,
+    "memorySize": 1024,
+    "authorizer": {
+        "type": "TOKEN",
+        "identitySource": "method.request.header.Authorization",
+        "authorizerResultTtlInSeconds": "300"
+    },
+    "endpoints": [],
+    "events": [],
+    "environment": {
+        "REGION": "${region}",
+        "COGNITO_POOL_ID": "${cognitoUserIdentityPoolId}"
+    },
+    "vpc": {
+        "securityGroupIds": [],
+        "subnetIds": []
+    }
+}
