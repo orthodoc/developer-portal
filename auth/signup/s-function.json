@@ -31,20 +31,12 @@
     ],
     "events": [],
     "environment": {
-        "SERVERLESS_PROJECT": "${project}",
-        "SERVERLESS_STAGE": "${stage}",
-        "SERVERLESS_REGION": "${region}",
-        "AWS_ACCOUNT_ID": "${awsAccountId}",
-        "COGNITO_IDENTITY_POOL_ID": "${cognitoIdentityPoolId}",
-        "COGNITO_DEVELOPER_PROVIDER_NAME": "${cognitoDeveloperProviderName}",
-        "COGNITO_USER_IDENTITY_POOL_ID": "${cognitoUserIdentityPoolId}",
-        "COGNITO_USER_IDENTITY_POOL_CLIENT_ID": "${cognitoUserIdentityPoolClientId}",
-        "JWT_SECRET": "${jwtSecret}",
+        "REGION": "${region}",
+        "COGNITO_CLIENT_ID": "${cognitoUserIdentityPoolClientId}",
         "RDS_HOST": "${rdsHost}",
         "RDS_USER": "${rdsUser}",
         "RDS_PASSWORD": "${rdsPassword}",
-        "RDS_DATABASE": "${rdsDatabase}",
-        "SES_EMAIL": "${sesEmail}"
+        "RDS_DATABASE": "${rdsDatabase}"
     },
     "vpc": {
         "securityGroupIds": [],

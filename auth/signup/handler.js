@@ -1,12 +1,10 @@
 'use strict';
-
 var async = require('async');
 var aws = require('aws-sdk');
-var response = require('../../lib/response');
-
-var db = require('../../lib/db');
-
+var mysql = require('mysql');
 var vandium = require('vandium');
+
+var db;
 
 vandium.validation({
   name: vandium.types.string().required().error(new Error('Parameter name is required')),
@@ -20,21 +18,34 @@ vandium.validation({
 
 module.exports.handler = vandium(function(event, context, callback) {
   var mainCallback = function(err, result) {
-    db.end();
-    return callback(response.makeError(err), result);
+    db.destroy();
+    return callback(err, result);
   };
 
-  db.connect();
+  db = mysql.createConnection({
+    host: process.env.RDS_HOST,
+    user: process.env.RDS_USER,
+    password: process.env.RDS_PASSWORD,
+    database: process.env.RDS_DATABASE,
+    ssl: 'Amazon RDS'
+  });
+
   async.waterfall([
     function(callbackLocal) {
-      db.getVendor(event.vendor, function(err) {
-        return callbackLocal(err);
+      db.query('SELECT * FROM `vendors` WHERE `id` = ?', [event.vendor], function(err, result) {
+        if (err) return callbackLocal(err);
+
+        if (result.length === 0) {
+          return callbackLocal(Error('Vendor ' + id + ' does not exist'));
+        }
+
+        return callbackLocal();
       });
     },
     function(callbackLocal) {
-      var provider = new aws.CognitoIdentityServiceProvider({region: process.env.SERVERLESS_REGION});
+      var provider = new aws.CognitoIdentityServiceProvider({region: process.env.REGION});
       provider.signUp({
-        ClientId: process.env.COGNITO_USER_IDENTITY_POOL_CLIENT_ID,
+        ClientId: process.env.COGNITO_CLIENT_ID,
         Username: event.email,
         Password: event.password,
         UserAttributes: [

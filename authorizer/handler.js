@@ -4,8 +4,8 @@ var jwt = require('jsonwebtoken');
 var request = require('request'); 
 var jwkToPem = require('jwk-to-pem');
 
-var userPoolId = process.env.COGNITO_USER_IDENTITY_POOL_ID;
-var region = process.env.SERVERLESS_REGION;
+var userPoolId = process.env.COGNITO_POOL_ID;
+var region = process.env.REGION;
 var iss = 'https://cognito-idp.' + region + '.amazonaws.com/' + userPoolId;
 var pems;
 
@@ -72,6 +72,7 @@ function ValidateToken(pems, event, callback) {
   //Verify the signature of the JWT token to ensure it's really coming from your User Pool
   jwt.verify(token, pem, { issuer: iss }, function(err, payload) {
     if(err) {
+      console.log(err);
       return callback(Error("Unauthorized"));
     } else {
       //Valid token. Generate the API Gateway policy for the user

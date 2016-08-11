@@ -4,7 +4,7 @@
   "description": "Serverless Lambda function for project: keboola-developer-portal",
   "customName": false,
   "customRole": false,
-  "handler": "apps/list/handler.handler",
+  "handler": "list/handler.handler",
   "timeout": 30,
   "memorySize": 1024,
   "authorizer": {},
@@ -28,9 +28,6 @@
   ],
   "events": [],
   "environment": {
-    "SERVERLESS_PROJECT": "${project}",
-    "SERVERLESS_STAGE": "${stage}",
-    "SERVERLESS_REGION": "${region}",
     "RDS_HOST": "${rdsHost}",
     "RDS_USER": "${rdsUser}",
     "RDS_PASSWORD": "${rdsPassword}",

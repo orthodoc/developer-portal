@@ -10,32 +10,11 @@
   },
   "main": "server.js",
   "dependencies": {
-    "async": "^1.4.2",
-    "aws-sdk": "^2.1.28",
-    "bcryptjs": "^2.1.0",
-    "body-parser": "^1.12.3",
-    "cognito-helper": "^1.0.0",
-    "dotenv": "^1.2.0",
-    "express": "^4.12.3",
-    "https-proxy-agent": "^1.0.0",
-    "jose": "^0.3.2",
-    "js-sha256": "^0.3.0",
-    "jwt-simple": "^0.3.0",
-    "lodash": "^3.10.1",
-    "log4js": "^0.6.27",
-    "moment": "^2.10.2",
-    "mysql": "^2.11.1",
-    "randomstring": "^1.0.6",
-    "request": "^2.74.0",
-    "string-format": "^0.5.0",
-    "underscore": "^1.8.3",
-    "vandium": "^3.0.0"
-  },
-  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.0.2",
     "serverless-cognito-manager": "^1.2.0",
     "serverless-cors-plugin": "^0.4.1",
-    "serverless-mocha-plugin": "^0.5.15",
-    "chai": "^3.5.0"
+    "serverless-mocha-plugin": "^0.5.15"
   },
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha --timeout 0"

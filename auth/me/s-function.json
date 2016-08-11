@@ -4,7 +4,7 @@
     "description": "Serverless Lambda function for project: keboola-developer-portal",
     "customName": false,
     "customRole": false,
-    "handler": "auth/me/handler.handler",
+    "handler": "me/handler.handler",
     "timeout": 30,
     "memorySize": 1024,
     "authorizer": {},
@@ -24,17 +24,14 @@
             "apiKeyRequired": false,
             "requestParameters": {},
             "requestTemplates": {
-                "application/json": "{\"userId\": \"$context.authorizer.principalId\",\"token\":\"$input.params().header.get('Authorization')\"}"
+                "application/json": "{\"token\":\"$input.params().header.get('Authorization')\"}"
             },
             "responses": "$${endpointResponsesTemplate}"
         }
     ],
     "events": [],
     "environment": {
-        "SERVERLESS_PROJECT": "${project}",
-        "SERVERLESS_STAGE": "${stage}",
-        "SERVERLESS_REGION": "${region}",
-        "COGNITO_USER_IDENTITY_POOL_ID": "${cognitoUserIdentityPoolId}"
+        "REGION": "${region}"
     },
     "vpc": {
         "securityGroupIds": [],

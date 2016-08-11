@@ -15,10 +15,8 @@
     "endpoints": [],
     "events": [],
     "environment": {
-        "SERVERLESS_PROJECT": "${project}",
-        "SERVERLESS_STAGE": "${stage}",
-        "SERVERLESS_REGION": "${region}",
-        "COGNITO_USER_IDENTITY_POOL_ID": "${cognitoUserIdentityPoolId}"
+        "REGION": "${region}",
+        "COGNITO_POOL_ID": "${cognitoUserIdentityPoolId}"
     },
     "vpc": {
         "securityGroupIds": [],

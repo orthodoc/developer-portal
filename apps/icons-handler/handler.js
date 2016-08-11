@@ -1,10 +1,8 @@
 'use strict';
-
 var async = require('async');
-var AWS = require('aws-sdk');
+var aws = require('aws-sdk');
+var db = require('../db');
 var vandium = require('vandium');
-
-var db = require('../../lib/db');
 
 module.exports.handler = vandium(function(event, context, callback)
 {

@@ -1,8 +1,6 @@
 'use strict';
-
 var async = require('async');
 var aws = require('aws-sdk');
-var response = require('../../lib/response');
 var vandium = require('vandium');
 
 vandium.validation({
@@ -10,12 +8,12 @@ vandium.validation({
   code: vandium.types.string().required()
 });
 
-module.exports.handler = vandium(function (event, context, callback) {
-  var provider = new aws.CognitoIdentityServiceProvider({region: process.env.SERVERLESS_REGION});
+module.exports.handler = vandium(function(event, context, callback) {
+  var provider = new aws.CognitoIdentityServiceProvider({region: process.env.REGION});
   async.waterfall([
     function (callbackLocal) {
       provider.confirmSignUp({
-        ClientId: process.env.COGNITO_USER_IDENTITY_POOL_CLIENT_ID,
+        ClientId: process.env.COGNITO_CLIENT_ID,
         ConfirmationCode: event.code,
         Username: event.email
       }, function(err) {
@@ -24,7 +22,7 @@ module.exports.handler = vandium(function (event, context, callback) {
     },
     function(callbackLocal) {
       provider.adminDisableUser({
-        UserPoolId: process.env.COGNITO_USER_IDENTITY_POOL_ID,
+        UserPoolId: process.env.COGNITO_POOL_ID,
         Username: event.email
       }, function(err) {
         return callbackLocal(err);
@@ -33,7 +31,7 @@ module.exports.handler = vandium(function (event, context, callback) {
   ], function (err) {
     if (err) return callback(err);
 
-    var ses = new aws.SES({apiVersion: '2010-12-01', region: process.env.SERVERLESS_REGION});
+    var ses = new aws.SES({apiVersion: '2010-12-01', region: process.env.REGION});
     ses.sendEmail({
       Source: process.env.SES_EMAIL,
       Destination: { ToAddresses: [process.env.SES_EMAIL] },

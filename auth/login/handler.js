@@ -1,9 +1,6 @@
 'use strict';
-
-var jwt = require('../../lib/jwt');
 var aws = require('aws-sdk');
-var response = require('../../lib/response');
-
+var moment = require('moment');
 var vandium = require('vandium');
 
 vandium.validation({
@@ -15,23 +12,23 @@ vandium.validation({
 module.exports.handler = vandium(function(event, context, callback) {
   var params = {
     AuthFlow: 'ADMIN_NO_SRP_AUTH',
-    ClientId: process.env.COGNITO_USER_IDENTITY_POOL_CLIENT_ID,
-    UserPoolId: process.env.COGNITO_USER_IDENTITY_POOL_ID,
+    ClientId: process.env.COGNITO_CLIENT_ID,
+    UserPoolId: process.env.COGNITO_POOL_ID,
     AuthParameters: {
       USERNAME: event.email,
       PASSWORD: event.password
     }
   };
 
-  var identity = new aws.CognitoIdentityServiceProvider({region: process.env.SERVERLESS_REGION});
+  var identity = new aws.CognitoIdentityServiceProvider({region: process.env.REGION});
   identity.adminInitiateAuth(params, function(err, data) {
     if (err) {
-      callback(err);
+      return callback(err);
     } else {
-      callback(null, {
-        AccessToken: data.AuthenticationResult.AccessToken,
-        ExpiresIn: data.AuthenticationResult.ExpiresIn
-      })
+      return callback(null, {
+        token: data.AuthenticationResult.AccessToken,
+        expires: moment().add(data.AuthenticationResult.ExpiresIn, 's').utc().format()
+      });
     }
   });
 
