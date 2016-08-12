@@ -1,6 +1,7 @@
 'use strict';
 var async = require('async');
 var db = require('../db');
+var identity = require('../identity');
 var vandium = require('vandium');
 
 vandium.validation({
@@ -45,8 +46,16 @@ module.exports.handler = vandium(function(event, context, callback) {
 
   db.connect();
   async.waterfall([
-    function(callbackLocal) {
-      db.getApp(event.appId, callbackLocal);
+    function (callbackLocal) {
+      identity.getUser(event.token, callbackLocal);
+    },
+    function (user, callbackLocal) {
+      db.getApp(event.appId, function(err, data) {
+        if (user.vendor !== data.vendor_id) {
+          return callbackLocal(Error('Unauthorized'));
+        }
+        return callbackLocal(err, data);
+      });
     },
     function(data, callbackLocal) {
       db.updateApp(event.body, event.appId, callbackLocal);

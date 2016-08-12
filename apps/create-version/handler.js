@@ -22,13 +22,13 @@ module.exports.handler = vandium(function(event, context, callback) {
   db.connect();
   async.waterfall([
     function (callbackLocal) {
-      identity.getUser(event.token, function (err, data) {
-        if (err) return callbackLocal(err);
-        return callbackLocal(null, data);
-      });
+      identity.getUser(event.token, callbackLocal);
     },
     function (user, callbackLocal) {
       db.getApp(event.appId, function(err, data) {
+        if (user.vendor !== data.vendor_id) {
+          return callbackLocal(Error('Unauthorized'));
+        }
         return callbackLocal(err, data, user);
       });
     },

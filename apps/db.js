@@ -117,7 +117,7 @@ module.exports = {
   },
 
   getPublishedApp: function(id, callback) {
-    db.query('SELECT a.id, a.vendor_id, av.name, av.type, av.image_url, av.image_tag, av.short_description,'
+    db.query('SELECT a.id, a.vendor_id, av.name, a.current_version, av.type, av.image_url, av.image_tag, av.short_description,'
       + 'av.long_description, av.license_url, av.documentation_url, av.required_memory, av.process_timeout,'
       + 'av.encryption, av.default_bucket, av.default_bucket_stage, av.forward_token, av.ui_options,'
       + 'av.test_configuration, av.configuration_schema, av.networking, av.actions, av.fees, av.limits, av.logger,'
@@ -132,7 +132,7 @@ module.exports = {
   },
 
   listAllPublishedApps: function(callback) {
-    db.query('SELECT a.id, a.vendor_id, av.name, av.type, av.image_url, av.image_tag, av.short_description,'
+    db.query('SELECT a.id, a.vendor_id, av.name, a.current_version, av.type, av.image_url, av.image_tag, av.short_description,'
       + 'av.long_description, av.license_url, av.documentation_url, av.required_memory, av.process_timeout,'
       + 'av.encryption, av.default_bucket, av.default_bucket_stage, av.forward_token, av.ui_options,'
       + 'av.test_configuration, av.configuration_schema, av.networking, av.actions, av.fees, av.limits, av.logger,'
