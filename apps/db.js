@@ -137,7 +137,7 @@ module.exports = {
       + 'av.encryption, av.default_bucket, av.default_bucket_stage, av.forward_token, av.ui_options,'
       + 'av.test_configuration, av.configuration_schema, av.networking, av.actions, av.fees, av.limits, av.logger,'
       + 'a.is_approved FROM `apps` AS `a` LEFT JOIN `app_versions` `av` ON (`a`.`current_version` = `av`.`version`)'
-      + 'WHERE `a`.`is_approved` = 1;', function(err, result) {
+      + 'WHERE `a`.`is_approved` = 1 AND `a`.`current_version` IS NOT NULL;', function(err, result) {
       if (err) return callback(err);
       return callback(err, result.map(formatAppOutput));
     });

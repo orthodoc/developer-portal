@@ -26,7 +26,7 @@ module.exports.handler = vandium(function(event, context, callback) {
       return callback(err);
     } else {
       return callback(null, {
-        token: data.AuthenticationResult.AccessToken,
+        token: data.AuthenticationResult.AccessToken, //data.AuthenticationResult.IdToken,
         expires: moment().add(data.AuthenticationResult.ExpiresIn, 's').utc().format()
       });
     }

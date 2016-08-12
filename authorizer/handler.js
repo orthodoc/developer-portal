@@ -79,7 +79,7 @@ function ValidateToken(pems, event, callback) {
       //Always generate the policy on value of 'sub' claim and not for 'username' because username is reassignable
       //sub is UUID for a user which is never reassigned to another user.
       var principalId = payload.sub;
-
+console.log(payload);
       //Get AWS AccountId and API Options
       var apiOptions = {};
       var tmp = event.methodArn.split(':');

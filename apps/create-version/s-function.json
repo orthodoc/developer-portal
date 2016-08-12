@@ -21,7 +21,7 @@
       "apiKeyRequired": false,
       "requestParameters": {},
       "requestTemplates": {
-        "application/json": "{\"token\":\"$input.params().header.get('Authorization')\", \"body\":$input.json('$')}"
+        "application/json": "{\"token\":\"$input.params().header.get('Authorization')\", \"body\":$input.json('$'), \"appId\": \"$input.params('appId')\"}"
       },
       "responses": "$${endpointResponsesTemplate}"
     }
