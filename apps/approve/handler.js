@@ -2,6 +2,7 @@
 var async = require('async');
 var aws = require('aws-sdk');
 var db = require('../db');
+var identity = require('../identity');
 var vandium = require('vandium');
 
 vandium.validation({
@@ -18,8 +19,19 @@ module.exports.handler = vandium(function(event, context, callback) {
 
   db.connect();
   async.waterfall([
-    function(callbackLocal) {
-      db.getApp(event.appId, callbackLocal);
+    function (callbackLocal) {
+      identity.getUser(event.token, callbackLocal);
+    },
+    function(user, callbackLocal) {
+      db.getApp(event.appId, function(err, data) {
+        if (user.vendor !== data.vendor_id) {
+          return callbackLocal(Error('Unauthorized'));
+        }
+        if (data.is_approved) {
+          return callbackLocal(Error('Already approved'));
+        }
+        return callbackLocal(err, data);
+      });
     },
     function(app, callbackLocal) {
       var required = ['image_url', 'image_tag', 'short_description', 'long_description', 'license_url', 'documentation_url'];
@@ -35,9 +47,9 @@ module.exports.handler = vandium(function(event, context, callback) {
       return callbackLocal(null, app);
     },
     function(app, callbackLocal) {
+      var s3 = new aws.S3();
       async.parallel([
         function(callbackLocal2) {
-          var s3 = new aws.S3();
           s3.headObject({ Bucket: process.env.S3_BUCKET_ICONS, Key: app.id + '-32.png' }, function(err) {
             if (err) {
               if (err.code === 'Forbidden') {
@@ -51,7 +63,6 @@ module.exports.handler = vandium(function(event, context, callback) {
           });
         },
         function(callbackLocal2) {
-          var s3 = new aws.S3();
           s3.headObject({ Bucket: process.env.S3_BUCKET_ICONS, Key: app.id + '-64.png' }, function(err) {
             if (err) {
               if (err.code === 'Forbidden') {
