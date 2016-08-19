@@ -31,7 +31,8 @@
     "RDS_HOST": "${rdsHost}",
     "RDS_USER": "${rdsUser}",
     "RDS_PASSWORD": "${rdsPassword}",
-    "RDS_DATABASE": "${rdsDatabase}"
+    "RDS_DATABASE": "${rdsDatabase}",
+    "ICONS_PUBLIC_FOLDER": "${iconsPublicFolder}"
   },
   "vpc": {
     "securityGroupIds": [],
