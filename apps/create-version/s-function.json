@@ -32,7 +32,8 @@
     "RDS_HOST": "${rdsHost}",
     "RDS_USER": "${rdsUser}",
     "RDS_PASSWORD": "${rdsPassword}",
-    "RDS_DATABASE": "${rdsDatabase}"
+    "RDS_DATABASE": "${rdsDatabase}",
+    "S3_BUCKET_ICONS": "${s3Bucket}"
   },
   "vpc": {
     "securityGroupIds": [],

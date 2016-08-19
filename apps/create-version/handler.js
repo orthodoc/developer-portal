@@ -1,5 +1,6 @@
 'use strict';
 var async = require('async');
+var aws = require('aws-sdk');
 var db = require('../db');
 var identity = require('../identity');
 var vandium = require('vandium');
@@ -51,6 +52,33 @@ module.exports.handler = vandium(function(event, context, callback) {
     },
     function(callbackLocal) {
       db.updateApp({current_version: event.body.version}, event.appId, callbackLocal);
+    },
+    function(callbackLocal) {
+      var s3 = new aws.S3();
+      async.parallel([
+        function(callbackLocal2) {
+          s3.copyObject(
+            {
+              CopySource: process.env.S3_BUCKET_ICONS + '/' + event.appId + '/latest-32.png',
+              Bucket: process.env.S3_BUCKET_ICONS,
+              Key: event.appId + '/' + event.body.version + '-32.png',
+              ACL: 'public-read'
+            },
+            callbackLocal2
+          );
+        },
+        function(callbackLocal2) {
+          s3.copyObject(
+            {
+              CopySource: process.env.S3_BUCKET_ICONS + '/' + event.appId + '/latest-64.png',
+              Bucket: process.env.S3_BUCKET_ICONS,
+              Key: event.appId + '/' + event.body.version + '-64.png',
+              ACL: 'public-read'
+            },
+            callbackLocal2
+          );
+        }
+      ], callbackLocal);
     }
   ], function(err) {
     if (err) return dbCloseCallback(err);
