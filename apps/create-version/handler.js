@@ -27,7 +27,7 @@ module.exports.handler = vandium(function(event, context, callback) {
     },
     function (user, callbackLocal) {
       db.getApp(event.appId, function(err, data) {
-        if (user.vendor !== data.vendor_id) {
+        if (user.vendor !== data.vendor.id) {
           return callbackLocal(Error('Unauthorized'));
         }
         return callbackLocal(err, data, user);

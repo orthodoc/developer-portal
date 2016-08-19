@@ -161,6 +161,32 @@ module.exports = {
     });
   },
 
+  getVendorApp: function(id, callback) {
+    db.query('SELECT a.id, a.name, a.vendor_id, v.name as vendor_name, v.address as vendor_address, '
+      + 'v.email as vendor_email, a.current_version, a.type, a.image_url, a.image_tag, a.short_description,'
+      + 'a.long_description, a.license_url, a.documentation_url, a.required_memory, a.process_timeout,'
+      + 'a.encryption, a.default_bucket, a.default_bucket_stage, a.forward_token, a.ui_options,'
+      + 'a.test_configuration, a.configuration_schema, a.networking, a.actions, a.fees, a.limits, a.logger,'
+      + 'a.is_approved FROM `apps` AS `a` '
+      + 'LEFT JOIN `vendors` v ON (`a`.`vendor_id` = `v`.`id`)'
+      + 'WHERE `a`.`id` = ?;', id, function(err, result) {
+      if (err) return callback(err);
+      if (result.length === 0) {
+        return callback(Error('App ' + id + ' does not exist or was not published yet'));
+      }
+      return callback(err, formatAppOutput(result[0]));
+    });
+  },
+
+  listAllVendorApps: function(vendor, callback) {
+    db.query('SELECT a.id, a.vendor_id, a.name, a.current_version, a.type, a.short_description '
+      + 'FROM `apps` AS `a` '
+      + 'WHERE `a`.`vendor_id`=?;', vendor, function(err, result) {
+      if (err) return callback(err);
+      return callback(err, result);
+    });
+  },
+
   getVendor: function(id, callback) {
     db.query('SELECT * FROM `vendors` WHERE `id` = ?', [id], function(err, result) {
       if (err) return callback(err);
