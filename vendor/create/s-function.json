@@ -1,5 +1,5 @@
 {
-  "name": "apps-create",
+  "name": "vendor-apps-create",
   "runtime": "nodejs4.3",
   "description": "Serverless Lambda function for project: keboola-developer-portal",
   "customName": false,
@@ -13,7 +13,7 @@
   },
   "endpoints": [
     {
-      "path": "apps",
+      "path": "vendor/apps",
       "method": "POST",
       "type": "AWS",
       "authorizationType": "custom",

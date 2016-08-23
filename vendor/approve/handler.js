@@ -50,9 +50,9 @@ module.exports.handler = vandium(function(event, context, callback) {
       var s3 = new aws.S3();
       async.parallel([
         function(callbackLocal2) {
-          s3.headObject({ Bucket: process.env.S3_BUCKET_ICONS, Key: app.id + '-32.png' }, function(err) {
+          s3.headObject({ Bucket: process.env.S3_BUCKET_ICONS, Key: app.id + '/latest-32.png' }, function(err) {
             if (err) {
-              if (err.code === 'Forbidden') {
+              if (err.code === 'NotFound') {
                 return callbackLocal2(Error('App icon of size 32px does not exist in s3 storage, upload it first.'));
               } else {
                 return callbackLocal2(err);
@@ -63,9 +63,9 @@ module.exports.handler = vandium(function(event, context, callback) {
           });
         },
         function(callbackLocal2) {
-          s3.headObject({ Bucket: process.env.S3_BUCKET_ICONS, Key: app.id + '-64.png' }, function(err) {
+          s3.headObject({ Bucket: process.env.S3_BUCKET_ICONS, Key: app.id + '/latest-64.png' }, function(err) {
             if (err) {
-              if (err.code === 'Forbidden') {
+              if (err.code === 'NotFound') {
                 return callbackLocal2(Error('App icon of size 64px does not exist in s3 storage, upload it first.'));
               } else {
                 return callbackLocal2(err);

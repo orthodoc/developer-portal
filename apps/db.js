@@ -40,14 +40,6 @@ var formatAppOutput = function(app) {
   return app;
 };
 
-var formatAppInput = function(app) {
-  if (app.ui_options) app.ui_options = JSON.stringify(app.ui_options);
-  if (app.test_configuration) app.test_configuration = JSON.stringify(app.test_configuration);
-  if (app.configuration_schema) app.configuration_schema = JSON.stringify(app.configuration_schema);
-  if (app.actions) app.actions = JSON.stringify(app.actions);
-  return app;
-};
-
 module.exports = {
 
   db: function() {
@@ -66,73 +58,6 @@ module.exports = {
 
   end: function() {
     db.destroy();
-  },
-
-  checkAppNotExists: function(id, callback) {
-    db.query('SELECT * FROM `apps` WHERE `id` = ?', [id], function(err, result) {
-      if (err) return callback(err);
-
-      if (result.length !== 0) {
-        return callback(Error('App ' + id + ' already exists'));
-      }
-
-      return callback();
-    });
-  },
-
-  insertApp: function(params, callback) {
-    db.query('INSERT INTO `apps` SET ?', formatAppInput(params), function(err) {
-      return callback(err);
-    });
-  },
-
-  updateApp: function(params, id, callback) {
-    db.query('UPDATE `apps` SET ? WHERE id = ?', [formatAppInput(params), id], function(err) {
-      return callback(err);
-    });
-  },
-
-  getApp: function(id, callback) {
-    db.query('SELECT * FROM `apps` WHERE `id` = ?', [id], function(err, result) {
-      if (err) return callback(err);
-
-      if (result.length === 0) {
-        return callback(Error('App ' + id + ' does not exist'));
-      }
-
-      return callback(null, formatAppOutput(result[0]));
-    });
-  },
-
-
-  checkAppVersionNotExists: function(id, version, callback) {
-    db.query('SELECT * FROM `app_versions` WHERE `app_id` = ? AND `version` = ?', [id, version], function(err, result) {
-      if (err) return callback(err);
-
-      if (result.length !== 0) {
-        return callback(Error('Version ' + version + ' of app ' + id + ' already exists'));
-      }
-
-      return callback();
-    });
-  },
-
-  insertAppVersion: function(params, callback) {
-    db.query('INSERT INTO `app_versions` SET ?', formatAppInput(params), function(err) {
-      return callback(err);
-    });
-  },
-
-  getAppVersion: function(id, version, callback) {
-    db.query('SELECT * FROM `app_versions` WHERE `app_id` = ? AND `version` = ?', [id, version], function(err, result) {
-      if (err) return callback(err);
-
-      if (result.length === 0) {
-        return callback(Error('Version ' + version + ' of app ' + id + ' does not exist'));
-      }
-
-      return callback(null, formatAppOutput(result[0]));
-    });
   },
 
   getPublishedApp: function(id, callback) {
@@ -154,48 +79,10 @@ module.exports = {
 
   listAllPublishedApps: function(callback) {
     db.query('SELECT a.id, a.vendor_id, av.name, a.current_version, av.type, av.short_description '
-      + 'FROM `apps` AS `a` LEFT JOIN `app_versions` `av` ON (`a`.`current_version` = `av`.`version`)'
+      + 'FROM `apps` AS `a` LEFT JOIN `app_versions` `av` ON (`a`.`id` = `av`.`app_id` AND `a`.`current_version` = `av`.`version`)'
       + 'WHERE `a`.`is_approved` = 1 AND `a`.`current_version` IS NOT NULL;', function(err, result) {
       if (err) return callback(err);
       return callback(err, result);
-    });
-  },
-
-  getVendorApp: function(id, callback) {
-    db.query('SELECT a.id, a.name, a.vendor_id, v.name as vendor_name, v.address as vendor_address, '
-      + 'v.email as vendor_email, a.current_version, a.type, a.image_url, a.image_tag, a.short_description,'
-      + 'a.long_description, a.license_url, a.documentation_url, a.required_memory, a.process_timeout,'
-      + 'a.encryption, a.default_bucket, a.default_bucket_stage, a.forward_token, a.ui_options,'
-      + 'a.test_configuration, a.configuration_schema, a.networking, a.actions, a.fees, a.limits, a.logger,'
-      + 'a.is_approved FROM `apps` AS `a` '
-      + 'LEFT JOIN `vendors` v ON (`a`.`vendor_id` = `v`.`id`)'
-      + 'WHERE `a`.`id` = ?;', id, function(err, result) {
-      if (err) return callback(err);
-      if (result.length === 0) {
-        return callback(Error('App ' + id + ' does not exist or was not published yet'));
-      }
-      return callback(err, formatAppOutput(result[0]));
-    });
-  },
-
-  listAllVendorApps: function(vendor, callback) {
-    db.query('SELECT a.id, a.vendor_id, a.name, a.current_version, a.type, a.short_description '
-      + 'FROM `apps` AS `a` '
-      + 'WHERE `a`.`vendor_id`=?;', vendor, function(err, result) {
-      if (err) return callback(err);
-      return callback(err, result);
-    });
-  },
-
-  getVendor: function(id, callback) {
-    db.query('SELECT * FROM `vendors` WHERE `id` = ?', [id], function(err, result) {
-      if (err) return callback(err);
-
-      if (result.length === 0) {
-        return callback(Error('Vendor ' + id + ' does not exist'));
-      }
-
-      return callback(null, result[0]);
     });
   }
 };

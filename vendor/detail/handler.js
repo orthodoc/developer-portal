@@ -5,8 +5,7 @@ var identity = require('../identity');
 var vandium = require('vandium');
 
 vandium.validation({
-  appId: vandium.types.string().required(),
-  vendor: vandium.types.string().required()
+  appId: vandium.types.string().required()
 });
 
 module.exports.handler = vandium(function(event, context, callback) {
@@ -21,14 +20,8 @@ module.exports.handler = vandium(function(event, context, callback) {
       identity.getUser(event.token, callbackLocal);
     },
     function (user, callbackLocal) {
-      if (user.vendor !== event.vendor) {
-        return callbackLocal(Error('Unauthorized'));
-      }
-      callbackLocal();
-    },
-    function (callbackLocal) {
       db.getVendorApp(event.appId, function(err, data) {
-        if (data.vendor.id !== event.vendor) {
+        if (data.vendor.id !== user.vendor) {
           return callbackLocal(Error('Unauthorized'));
         }
         return callbackLocal(err, data);

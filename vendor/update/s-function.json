@@ -13,7 +13,7 @@
   },
   "endpoints": [
     {
-      "path": "apps/{appId}",
+      "path": "vendor/apps/{appId}",
       "method": "PATCH",
       "type": "AWS",
       "authorizationType": "custom",

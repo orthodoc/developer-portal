@@ -40,7 +40,7 @@ module.exports.handler = vandium(function(event, context, callback) {
     },
     function(data, user, callbackLocal) {
       delete data.id;
-      delete data.vendor_id;
+      delete data.vendor;
       delete data.current_version;
       delete data.is_approved;
       delete data.created_time;

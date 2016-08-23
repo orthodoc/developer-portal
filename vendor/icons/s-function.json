@@ -1,10 +1,10 @@
 {
-  "name": "apps-vendor-detail",
+  "name": "vendor-apps-icons",
   "runtime": "nodejs4.3",
   "description": "Serverless Lambda function for project: keboola-developer-portal",
   "customName": false,
   "customRole": false,
-  "handler": "vendor-detail/handler.handler",
+  "handler": "icons/handler.handler",
   "timeout": 30,
   "memorySize": 1024,
   "authorizer": {},
@@ -13,15 +13,15 @@
   },
   "endpoints": [
     {
-      "path": "{vendor}/apps/{appId}",
-      "method": "GET",
+      "path": "vendor/apps/{appId}/icons",
+      "method": "POST",
       "type": "AWS",
-      "authorizationType": "none",
-      "authorizerFunction": false,
+      "authorizationType": "custom",
+      "authorizerFunction": "authorizer",
       "apiKeyRequired": false,
       "requestParameters": {},
       "requestTemplates": {
-        "application/json": "{\"appId\": \"$input.params('appId')\", \"token\":\"$input.params().header.get('Authorization')\", \"vendor\": \"$input.params('vendor')\"}"
+        "application/json": "{\"token\":\"$input.params().header.get('Authorization')\", \"appId\": \"$input.params('appId')\"}"
       },
       "responses": "$${endpointResponsesTemplate}"
     }
@@ -33,7 +33,7 @@
     "RDS_USER": "${rdsUser}",
     "RDS_PASSWORD": "${rdsPassword}",
     "RDS_DATABASE": "${rdsDatabase}",
-    "ICONS_PUBLIC_FOLDER": "${iconsPublicFolder}"
+    "S3_BUCKET_ICONS": "${s3Bucket}"
   },
   "vpc": {
     "securityGroupIds": [],

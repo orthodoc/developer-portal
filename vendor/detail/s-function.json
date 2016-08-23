@@ -1,10 +1,10 @@
 {
-  "name": "apps-approve",
+  "name": "vendor-apps-detail",
   "runtime": "nodejs4.3",
   "description": "Serverless Lambda function for project: keboola-developer-portal",
   "customName": false,
   "customRole": false,
-  "handler": "approve/handler.handler",
+  "handler": "detail/handler.handler",
   "timeout": 30,
   "memorySize": 1024,
   "authorizer": {},
@@ -13,15 +13,15 @@
   },
   "endpoints": [
     {
-      "path": "apps/{appId}/approve",
-      "method": "POST",
+      "path": "/vendor/apps/{appId}",
+      "method": "GET",
       "type": "AWS",
       "authorizationType": "custom",
       "authorizerFunction": "authorizer",
       "apiKeyRequired": false,
       "requestParameters": {},
       "requestTemplates": {
-        "application/json": "{\"token\":\"$input.params().header.get('Authorization')\", \"body\":$input.json('$'), \"appId\": \"$input.params('appId')\"}"
+        "application/json": "{\"appId\": \"$input.params('appId')\", \"token\":\"$input.params().header.get('Authorization')\"}"
       },
       "responses": "$${endpointResponsesTemplate}"
     }
@@ -33,8 +33,7 @@
     "RDS_USER": "${rdsUser}",
     "RDS_PASSWORD": "${rdsPassword}",
     "RDS_DATABASE": "${rdsDatabase}",
-    "SES_EMAIL": "${sesEmail}",
-    "S3_BUCKET_ICONS": "${s3Bucket}"
+    "ICONS_PUBLIC_FOLDER": "${iconsPublicFolder}"
   },
   "vpc": {
     "securityGroupIds": [],

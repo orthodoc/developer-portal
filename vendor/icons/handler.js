@@ -38,14 +38,26 @@ module.exports.handler = vandium(function(event, context, callback) {
         32: function (callbackLocal2) {
           s3.getSignedUrl(
             'putObject',
-            {Bucket: process.env.S3_BUCKET_ICONS, Key: app.id + '/latest-32.png', Expires: validity, ContentType: 'image/png'},
+            {
+              Bucket: process.env.S3_BUCKET_ICONS,
+              Key: app.id + '/latest-32.png',
+              Expires: validity,
+              ContentType: 'image/png',
+              ACL: 'public-read'
+            },
             callbackLocal2
           );
         },
         64: function (callbackLocal2) {
           s3.getSignedUrl(
             'putObject',
-            {Bucket: process.env.S3_BUCKET_ICONS, Key: app.id + '/latest-64.png', Expires: validity, ContentType: 'image/png'},
+            {
+              Bucket: process.env.S3_BUCKET_ICONS,
+              Key: app.id + '/latest-64.png',
+              Expires: validity,
+              ContentType: 'image/png',
+              ACL: 'public-read'
+            },
             callbackLocal2
           );
         }
