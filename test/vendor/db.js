@@ -1,12 +1,11 @@
 'use strict';
-
 require('dotenv').config();
-var expect = require('chai').expect;
 
-var execsql = require('../lib/execsql');
 var async = require('async');
+var db = require('../../vendor/db');
+var execsql = require('../../execsql');
+var expect = require('chai').expect;
 var mysql = require('mysql');
-var db = require('../lib/db');
 var rds;
 
 describe('db', function() {
@@ -19,7 +18,7 @@ describe('db', function() {
       ssl: process.env.RDS_SSL ? 'Amazon RDS' : false,
       multipleStatements: true
     });
-    execsql.execFile(rds, __dirname + '/../rds-model.sql', function(err, res) {
+    execsql.execFile(rds, __dirname + '/../../rds-model.sql', function(err, res) {
       if (err) throw err;
       done();
     });
@@ -51,7 +50,7 @@ describe('db', function() {
   });
 
   describe('checkAppNotExists', function() {
-    it('app does not exists', function(done) {
+    it('app does not exist', function(done) {
       var appId = 'ex-adwords';
 
       db.connect();
@@ -61,15 +60,16 @@ describe('db', function() {
       })
     });
 
-    it('app exists', function() {
-      execsql.exec(rds, 'INSERT INTO `vendors` SET id="keboola";INSERT INTO `apps` SET id="ex-adwords", vendor_id="keboola";', function(err, res) {
+    it('app exists', function(done) {
+      execsql.exec(rds, 'INSERT INTO `vendors` SET id="keboola";INSERT INTO `apps` SET id="ex-adwords", vendor_id="keboola";', function(err) {
         if (err) throw err;
 
         db.connect();
-        db.checkAppNotExists('ex-adwords', function(err) {
-          expect(err).to.be.null;
+        expect(function(){
+          db.checkAppNotExists('ex-adwords');
+        }).to.throw(function() {
           done();
-        })
+        });
       });
     });
   });
