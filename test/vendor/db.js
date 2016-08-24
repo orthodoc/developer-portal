@@ -60,18 +60,23 @@ describe('db', function() {
       })
     });
 
-    it('app exists', function(done) {
-      var appId = 'ex-' +  Math.random();
-      execsql.exec(rds, 'INSERT INTO `vendors` SET id="keboola";INSERT INTO `apps` SET id="'+appId+'", vendor_id="keboola", name="test", type="reader";', function(err) {
-        if (err) throw err;
+    it('app exists', function (done) {
+      var appId = 'ex-' + Math.random();
+      execsql.exec(
+        rds,
+        'INSERT INTO `vendors` SET id="keboola", name="test", address="test", email="test";'
+        + 'INSERT INTO `apps` SET id="' + appId + '", vendor_id="keboola", name="test", type="reader";',
+        function (err) {
+          if (err) throw err;
 
-        db.connect();
-        expect(function(){
-          db.checkAppNotExists(appId, function() {});
-        }).to.throw(function() {
-          done();
+          db.connect();
+          expect(function () {
+            db.checkAppNotExists(appId, function () {
+            });
+          }).to.throw(function () {
+            done();
+          });
         });
-      });
     });
   });
 
@@ -192,7 +197,7 @@ describe('db', function() {
         if (err) throw err;
         rds.query('INSERT INTO `apps` SET id=?, vendor_id=?, name="test", type="reader";', [appId, vendor], function(err) {
           if (err) throw err;
-          rds.query('INSERT INTO `app_versions` SET app_id=?, version=?;', [appId, version], function(err) {
+          rds.query('INSERT INTO `app_versions` SET app_id=?, version=?, name="test", type="reader";', [appId, version], function(err) {
             if (err) throw err;
             db.connect();
             db.checkAppVersionNotExists(appId, version, function(err) {
@@ -216,7 +221,7 @@ describe('db', function() {
         rds.query('INSERT INTO `apps` SET id=?, vendor_id=?, name="test", type="reader";', [appId, vendor], function(err) {
           if (err) throw err;
           db.connect();
-          db.insertAppVersion({app_id: appId, version: version}, function(err) {
+          db.insertAppVersion({app_id: appId, version: version, name: 'test', type: 'reader'}, function(err) {
             expect(err).to.be.null;
             rds.query('SELECT * FROM `app_versions` WHERE app_id=? AND version=?', [appId, version], function(err, res) {
               if (err) throw err;
