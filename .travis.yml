@@ -11,4 +11,6 @@ install:
   - npm install mocha
 
 before_script:
+  - bash .travis.install-mysql-5.7.sh
   - mysql -e 'create database dev_portal_test;'
+  - mysql -e "create user 'dev_portal_test'@'localhost' identified by 'dev_portal_pass'; grant all privileges on dev_portal_test. * to 'dev_portal_test'@'localhost';" -uroot
