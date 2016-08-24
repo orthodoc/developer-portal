@@ -62,7 +62,7 @@ describe('db', function() {
 
     it('app exists', function(done) {
       var appId = 'ex-' +  Math.random();
-      execsql.exec(rds, 'INSERT INTO `vendors` SET id="keboola";INSERT INTO `apps` SET id="'+appId+'", vendor_id="keboola";', function(err) {
+      execsql.exec(rds, 'INSERT INTO `vendors` SET id="keboola";INSERT INTO `apps` SET id="'+appId+'", vendor_id="keboola", name="test", type="reader";', function(err) {
         if (err) throw err;
 
         db.connect();
@@ -80,7 +80,7 @@ describe('db', function() {
       var appId = 'ex-' + Math.random();
       var vendor = 'v' + Math.random();
 
-      rds.query('INSERT INTO `vendors` SET id=?;', vendor, function() {
+      rds.query('INSERT INTO `vendors` SET id=?, name="test", address="test", email="test";', vendor, function() {
         db.connect();
         db.insertApp({id: appId, vendor_id: vendor}, function() {
           rds.query('SELECT * FROM `apps` WHERE id=?', appId, function (err, res) {
@@ -95,8 +95,8 @@ describe('db', function() {
       var appId = 'ex-' + Math.random();
       var vendor = 'v' + Math.random();
 
-      rds.query('INSERT INTO `vendors` SET id=?;', vendor, function() {
-        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?;', [appId, vendor], function() {
+      rds.query('INSERT INTO `vendors` SET id=?, name="test", address="test", email="test";', vendor, function() {
+        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?, name="test", type="reader";', [appId, vendor], function() {
           db.connect();
           db.insertApp({id: appId, vendor_id: vendor}, function() {
             expect(function() {
@@ -115,9 +115,9 @@ describe('db', function() {
       var appId = 'ex-' + Math.random();
       var vendor = 'v' + Math.random();
 
-      rds.query('INSERT INTO `vendors` SET id=?;', vendor, function(err) {
+      rds.query('INSERT INTO `vendors` SET id=?, name="test", address="test", email="test";', vendor, function(err) {
         if (err) throw err;
-        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?;', [appId, vendor], function(err) {
+        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?, name="test", type="reader";', [appId, vendor], function(err) {
           if (err) throw err;
           db.connect();
           db.updateApp({name: 'New name'}, appId, function() {
@@ -148,9 +148,9 @@ describe('db', function() {
       var appId = 'ex-' + Math.random();
       var vendor = 'v' + Math.random();
 
-      rds.query('INSERT INTO `vendors` SET id=?;', vendor, function(err) {
+      rds.query('INSERT INTO `vendors` SET id=?, name="test", address="test", email="test";', vendor, function(err) {
         if (err) throw err;
-        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?;', [appId, vendor], function(err) {
+        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?, name="test", type="reader";', [appId, vendor], function(err) {
           if (err) throw err;
           db.connect();
           db.getApp(appId, function(err, res) {
@@ -170,9 +170,9 @@ describe('db', function() {
       var vendor = 'v' + Math.random();
       var version = 'v' + Math.random();
 
-      rds.query('INSERT INTO `vendors` SET id=?;', vendor, function(err) {
+      rds.query('INSERT INTO `vendors` SET id=?, name="test", address="test", email="test";', vendor, function(err) {
         if (err) throw err;
-        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?;', [appId, vendor], function(err) {
+        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?, name="test", type="reader";', [appId, vendor], function(err) {
           if (err) throw err;
           db.connect();
           db.checkAppVersionNotExists(appId, version, function(err) {
@@ -188,9 +188,9 @@ describe('db', function() {
       var vendor = 'v' + Math.random();
       var version = 'v' + Math.random();
 
-      rds.query('INSERT INTO `vendors` SET id=?;', vendor, function(err) {
+      rds.query('INSERT INTO `vendors` SET id=?, name="test", address="test", email="test";', vendor, function(err) {
         if (err) throw err;
-        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?;', [appId, vendor], function(err) {
+        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?, name="test", type="reader";', [appId, vendor], function(err) {
           if (err) throw err;
           rds.query('INSERT INTO `app_versions` SET app_id=?, version=?;', [appId, version], function(err) {
             if (err) throw err;
@@ -211,9 +211,9 @@ describe('db', function() {
       var vendor = 'v' + Math.random();
       var version = 'v' + Math.random();
 
-      rds.query('INSERT INTO `vendors` SET id=?;', vendor, function(err) {
+      rds.query('INSERT INTO `vendors` SET id=?, name="test", address="test", email="test";', vendor, function(err) {
         if (err) throw err;
-        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?;', [appId, vendor], function(err) {
+        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?, name="test", type="reader";', [appId, vendor], function(err) {
           if (err) throw err;
           db.connect();
           db.insertAppVersion({app_id: appId, version: version}, function(err) {
@@ -235,13 +235,13 @@ describe('db', function() {
       var vendor = 'v' + Math.random();
       var vendor2 = 'v' + Math.random();
 
-      rds.query('INSERT INTO `vendors` SET id=?;', vendor, function(err) {
+      rds.query('INSERT INTO `vendors` SET id=?, name="test", address="test", email="test";', vendor, function(err) {
         if (err) throw err;
-        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?;', [appId, vendor], function(err) {
+        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?, name="test", type="reader";', [appId, vendor], function(err) {
           if (err) throw err;
-          rds.query('INSERT INTO `vendors` SET id=?;', vendor2, function(err) {
+          rds.query('INSERT INTO `vendors` SET id=?, name="test", address="test", email="test";', vendor2, function(err) {
             if (err) throw err;
-            rds.query('INSERT INTO `apps` SET id=?, vendor_id=?;', ['ex-' + Math.random(), vendor2], function(err) {
+            rds.query('INSERT INTO `apps` SET id=?, vendor_id=?, name="test", type="reader";', ['ex-' + Math.random(), vendor2], function(err) {
               if (err) throw err;
               db.connect();
               db.listAppsForVendor(vendor, function(err, res) {
