@@ -87,7 +87,7 @@ describe('db', function() {
 
       rds.query('INSERT INTO `vendors` SET id=?, name="test", address="test", email="test";', vendor, function() {
         db.connect();
-        db.insertApp({id: appId, vendor_id: vendor}, function() {
+        db.insertApp({id: appId, vendor_id: vendor, name: 'test', type: 'reader'}, function() {
           rds.query('SELECT * FROM `apps` WHERE id=?', appId, function (err, res) {
             expect(res).to.have.length(1);
             done();
@@ -103,7 +103,7 @@ describe('db', function() {
       rds.query('INSERT INTO `vendors` SET id=?, name="test", address="test", email="test";', vendor, function() {
         rds.query('INSERT INTO `apps` SET id=?, vendor_id=?, name="test", type="reader";', [appId, vendor], function() {
           db.connect();
-          db.insertApp({id: appId, vendor_id: vendor}, function() {
+          db.insertApp({id: appId, vendor_id: vendor, name: 'test', type: 'reader'}, function() {
             expect(function() {
               rds.query('SELECT * FROM `apps` WHERE id=?', appId, function() {});
             }).to.throw(function() {
