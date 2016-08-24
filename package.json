@@ -14,7 +14,7 @@
     "serverless-cors-plugin": "^0.4.1",
     "serverless-mocha-plugin": "^0.5.15"
   },
-  "dependencies_dev": {
+  "devDependencies": {
     "async": "^2.0.1",
     "chai": "^3.5.0",
     "dotenv": "^2.0.0",
