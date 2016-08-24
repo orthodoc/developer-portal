@@ -18,7 +18,7 @@ describe('db', function() {
       ssl: process.env.RDS_SSL ? 'Amazon RDS' : false,
       multipleStatements: true
     });
-    execsql.execFile(rds, __dirname + '/../../rds-model.sql', function(err, res) {
+    execsql.execFile(rds, __dirname + '/../../rds-model.sql', function(err) {
       if (err) throw err;
       done();
     });
@@ -51,7 +51,7 @@ describe('db', function() {
 
   describe('checkAppNotExists', function() {
     it('app does not exist', function(done) {
-      var appId = 'ex-adwords';
+      var appId = 'ex-' + Math.random();
 
       db.connect();
       db.checkAppNotExists(appId, function(err) {
@@ -61,14 +61,197 @@ describe('db', function() {
     });
 
     it('app exists', function(done) {
-      execsql.exec(rds, 'INSERT INTO `vendors` SET id="keboola";INSERT INTO `apps` SET id="ex-adwords", vendor_id="keboola";', function(err) {
+      var appId = 'ex-' +  Math.random();
+      execsql.exec(rds, 'INSERT INTO `vendors` SET id="keboola";INSERT INTO `apps` SET id="'+appId+'", vendor_id="keboola";', function(err) {
         if (err) throw err;
 
         db.connect();
         expect(function(){
-          db.checkAppNotExists('ex-adwords');
+          db.checkAppNotExists(appId, function() {});
         }).to.throw(function() {
           done();
+        });
+      });
+    });
+  });
+
+  describe('insertApp', function() {
+    it('insert new app', function(done) {
+      var appId = 'ex-' + Math.random();
+      var vendor = 'v' + Math.random();
+
+      rds.query('INSERT INTO `vendors` SET id=?;', vendor, function() {
+        db.connect();
+        db.insertApp({id: appId, vendor_id: vendor}, function() {
+          rds.query('SELECT * FROM `apps` WHERE id=?', appId, function (err, res) {
+            expect(res).to.have.length(1);
+            done();
+          });
+        });
+      });
+    });
+
+    it('insert already existing app', function(done) {
+      var appId = 'ex-' + Math.random();
+      var vendor = 'v' + Math.random();
+
+      rds.query('INSERT INTO `vendors` SET id=?;', vendor, function() {
+        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?;', [appId, vendor], function() {
+          db.connect();
+          db.insertApp({id: appId, vendor_id: vendor}, function() {
+            expect(function() {
+              rds.query('SELECT * FROM `apps` WHERE id=?', appId, function() {});
+            }).to.throw(function() {
+              done();
+            });
+          })
+        })
+      });
+    });
+  });
+
+  describe('updateApp', function() {
+    it('update existing app', function(done) {
+      var appId = 'ex-' + Math.random();
+      var vendor = 'v' + Math.random();
+
+      rds.query('INSERT INTO `vendors` SET id=?;', vendor, function(err) {
+        if (err) throw err;
+        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?;', [appId, vendor], function(err) {
+          if (err) throw err;
+          db.connect();
+          db.updateApp({name: 'New name'}, appId, function() {
+            rds.query('SELECT * FROM `apps` WHERE id=?', appId, function(err, res) {
+              if (err) throw err;
+              expect(res).to.have.length(1);
+              expect(res[0].name).to.equal('New name');
+              done();
+            });
+          })
+        })
+      });
+    });
+  });
+
+  describe('getApp', function() {
+    it('get non-existing app', function(done) {
+      var appId = 'ex-' + Math.random();
+
+      db.connect();
+      db.getApp(appId, function(err) {
+        expect(err).to.not.be.null;
+        done();
+      });
+    });
+
+    it('get existing app', function(done) {
+      var appId = 'ex-' + Math.random();
+      var vendor = 'v' + Math.random();
+
+      rds.query('INSERT INTO `vendors` SET id=?;', vendor, function(err) {
+        if (err) throw err;
+        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?;', [appId, vendor], function(err) {
+          if (err) throw err;
+          db.connect();
+          db.getApp(appId, function(err, res) {
+            expect(err).to.be.null;
+            expect(res).to.have.property('id');
+            expect(res.id).to.be.equal(appId);
+            done();
+          })
+        })
+      });
+    });
+  });
+
+  describe('checkAppVersionNotExists', function() {
+    it('version does not exist', function(done) {
+      var appId = 'ex-' + Math.random();
+      var vendor = 'v' + Math.random();
+      var version = 'v' + Math.random();
+
+      rds.query('INSERT INTO `vendors` SET id=?;', vendor, function(err) {
+        if (err) throw err;
+        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?;', [appId, vendor], function(err) {
+          if (err) throw err;
+          db.connect();
+          db.checkAppVersionNotExists(appId, version, function(err) {
+            expect(err).to.be.undefined;
+            done();
+          })
+        })
+      });
+    });
+
+    it('version does exist', function(done) {
+      var appId = 'ex-' + Math.random();
+      var vendor = 'v' + Math.random();
+      var version = 'v' + Math.random();
+
+      rds.query('INSERT INTO `vendors` SET id=?;', vendor, function(err) {
+        if (err) throw err;
+        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?;', [appId, vendor], function(err) {
+          if (err) throw err;
+          rds.query('INSERT INTO `app_versions` SET app_id=?, version=?;', [appId, version], function(err) {
+            if (err) throw err;
+            db.connect();
+            db.checkAppVersionNotExists(appId, version, function(err) {
+              expect(err).to.not.be.undefined;
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
+
+  describe('insertAppVersion', function() {
+    it('insert new version', function(done) {
+      var appId = 'ex-' + Math.random();
+      var vendor = 'v' + Math.random();
+      var version = 'v' + Math.random();
+
+      rds.query('INSERT INTO `vendors` SET id=?;', vendor, function(err) {
+        if (err) throw err;
+        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?;', [appId, vendor], function(err) {
+          if (err) throw err;
+          db.connect();
+          db.insertAppVersion({app_id: appId, version: version}, function(err) {
+            expect(err).to.be.null;
+            rds.query('SELECT * FROM `app_versions` WHERE app_id=? AND version=?', [appId, version], function(err, res) {
+              if (err) throw err;
+              expect(res).to.have.length(1);
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
+
+  describe('listAppsForVendor', function() {
+    it('list', function(done) {
+      var appId = 'ex-' + Math.random();
+      var vendor = 'v' + Math.random();
+      var vendor2 = 'v' + Math.random();
+
+      rds.query('INSERT INTO `vendors` SET id=?;', vendor, function(err) {
+        if (err) throw err;
+        rds.query('INSERT INTO `apps` SET id=?, vendor_id=?;', [appId, vendor], function(err) {
+          if (err) throw err;
+          rds.query('INSERT INTO `vendors` SET id=?;', vendor2, function(err) {
+            if (err) throw err;
+            rds.query('INSERT INTO `apps` SET id=?, vendor_id=?;', ['ex-' + Math.random(), vendor2], function(err) {
+              if (err) throw err;
+              db.connect();
+              db.listAppsForVendor(vendor, function(err, res) {
+                expect(err).to.be.null;
+                expect(res).to.have.length(1);
+                expect(res[0].id).to.be.equal(appId);
+                done();
+              });
+            });
+          });
         });
       });
     });

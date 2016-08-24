@@ -15,6 +15,7 @@ CREATE TABLE `apps` (
   `vendor_id` varchar(50) NOT NULL,
   `user_id` varchar(128) DEFAULT NULL,
   `user_email` varchar(128) DEFAULT NULL,
+  `current_version` varchar(50) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
   `type` enum('reader','application','writer') NOT NULL DEFAULT 'reader',
   `image_url` varchar(255) DEFAULT NULL,
@@ -40,8 +41,7 @@ CREATE TABLE `apps` (
   `is_approved` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `created_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `vendor_id` (`vendor_id`),
-  CONSTRAINT `apps_ibfk_1` FOREIGN KEY (`vendor_id`) REFERENCES `vendors` (`id`)
+  KEY `vendor_id` (`vendor_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS app_versions;
@@ -50,7 +50,6 @@ CREATE TABLE `app_versions` (
   `version` varchar(50) NOT NULL,
   `user_id` varchar(128) DEFAULT NULL,
   `user_email` varchar(128) DEFAULT NULL,
-  `current_version` varchar(50) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
   `type` enum('reader','application','writer') NOT NULL DEFAULT 'reader',
   `image_url` varchar(255) DEFAULT NULL,

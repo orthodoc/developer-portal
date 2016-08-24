@@ -16,7 +16,7 @@ module.exports.handler = vandium(function(event, context, callback) {
       identity.getUser(event.token, callbackLocal);
     },
     function(user, callbackLocal) {
-      db.listAllVendorApps(user.vendor, function(err, res) {
+      db.listAppsForVendor(user.vendor, function(err, res) {
         res.map(function(app) {
           app.icon = {
             32: process.env.ICONS_PUBLIC_FOLDER + '/' + app.id + '/latest-32.png',

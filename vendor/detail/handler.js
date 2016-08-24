@@ -20,7 +20,7 @@ module.exports.handler = vandium(function(event, context, callback) {
       identity.getUser(event.token, callbackLocal);
     },
     function (user, callbackLocal) {
-      db.getVendorApp(event.appId, function(err, data) {
+      db.getApp(event.appId, function(err, data) {
         if (data.vendor.id !== user.vendor) {
           return callbackLocal(Error('Unauthorized'));
         }
@@ -28,6 +28,7 @@ module.exports.handler = vandium(function(event, context, callback) {
       });
     },
     function(data, callbackLocal) {
+      delete data.vendor;
       data.icon = {
         32: process.env.ICONS_PUBLIC_FOLDER + '/' + data.id + '/latest-32.png',
         64: process.env.ICONS_PUBLIC_FOLDER + '/' + data.id + '/latest-64.png'
