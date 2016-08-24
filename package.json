@@ -10,13 +10,16 @@
   },
   "main": "server.js",
   "dependencies": {
+    "serverless-cognito-manager": "^1.2.0",
+    "serverless-cors-plugin": "^0.4.1",
+    "serverless-mocha-plugin": "^0.5.15"
+  },
+  "dependencies_dev": {
+    "async": "^2.0.1",
     "chai": "^3.5.0",
     "dotenv": "^2.0.0",
     "mocha": "^3.0.2",
     "mysql": "^2.11.1",
-    "serverless-cognito-manager": "^1.2.0",
-    "serverless-cors-plugin": "^0.4.1",
-    "serverless-mocha-plugin": "^0.5.15",
     "underscore": "^1.8.3"
   },
   "scripts": {
