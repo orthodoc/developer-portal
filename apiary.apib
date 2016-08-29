@@ -446,6 +446,54 @@ Request will be sent only if the app has icons uploaded and all these attributes
                 "is_approved": false
             }
 
+### List versions [GET /vendor/apps/{appId}/versions]
+
++ Parameters
+    + appId - id of the application, it is prefixed by vendor id, e.g. `keboola.ex-adwords`
+    
++ Request
+
+    + Headers
+
+            Authorization: {your_token}
+
++ Response 200 (application/json)
+
+    + Body
+    
+            [
+                {
+                    "id": "keboola.ex-adwords",
+                    "version": "1.0.2",
+                    "name": "AdWords Extractor",
+                    "type": "reader",
+                    "image_url": null,
+                    "image_tag": null,
+                    "short_description": null,
+                    "long_description": null,
+                    "license_url": null,
+                    "documentation_url": null,
+                    "required_memory": null,
+                    "process_timeout": null,
+                    "encryption": false,
+                    "default_bucket": false,
+                    "default_bucket_stage": "in",
+                    "forward_token": false,
+                    "ui_options": [],
+                    "test_configuration": null,
+                    "configuration_schema": null,
+                    "networking": "dataIn",
+                    "actions": [],
+                    "fees": false,
+                    "limits": null,
+                    "logger": "standard",
+                    "icon": {
+                        "32": "https://s3.amazonaws.com/dev-portal-icons/keboola.ex-adwords-v2/1.0.2-32.png",
+                        "64": "https://s3.amazonaws.com/dev-portal-icons/keboola.ex-adwords-v2/1.0.2-64.png"
+                    }
+                }
+            ]
+
 ### Get version detail [GET /vendor/apps/{appId}/versions/{version}]
 
 + Parameters
