@@ -123,10 +123,29 @@ module.exports = {
     });
   },
 
+  getAppVersion: function(id, version, callback) {
+    db.query('SELECT * FROM `app_versions` WHERE `app_id` = ? AND `version` = ?', [id, version], function(err, result) {
+      if (err) return callback(err);
+
+      if (result.length === 0) {
+        return callback(Error('Version ' + version + ' of app ' + id + ' does not exist'));
+      }
+
+      return callback(null, formatAppOutput(result[0]));
+    });
+  },
+
   listAppsForVendor: function(vendor, callback) {
     db.query('SELECT a.id, a.vendor_id, a.name, a.current_version, a.type, a.short_description '
       + 'FROM `apps` AS `a` '
       + 'WHERE `a`.`vendor_id`=?;', vendor, function(err, result) {
+      if (err) return callback(err);
+      return callback(err, result);
+    });
+  },
+
+  listAppVersions: function(id, callback) {
+    db.query('SELECT * FROM app_versions WHERE app_id=?;', id, function(err, result) {
       if (err) return callback(err);
       return callback(err, result);
     });

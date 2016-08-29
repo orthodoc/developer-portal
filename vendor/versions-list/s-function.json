@@ -1,0 +1,42 @@
+{
+  "name": "vendor-apps-versions-list",
+  "runtime": "nodejs4.3",
+  "description": "Serverless Lambda function for project: keboola-developer-portal",
+  "customName": false,
+  "customRole": false,
+  "handler": "versions-list/handler.handler",
+  "timeout": 30,
+  "memorySize": 1024,
+  "authorizer": {},
+  "custom": {
+    "excludePatterns": []
+  },
+  "endpoints": [
+    {
+      "path": "vendor/apps/{appId}/versions",
+      "method": "GET",
+      "type": "AWS",
+      "authorizationType": "custom",
+      "authorizerFunction": "authorizer",
+      "apiKeyRequired": false,
+      "requestParameters": {},
+      "requestTemplates": {
+        "application/json": "{\"token\":\"$input.params().header.get('Authorization')\", \"appId\": \"$input.params('appId')\"}"
+      },
+      "responses": "$${endpointResponsesTemplate}"
+    }
+  ],
+  "events": [],
+  "environment": {
+    "REGION": "${region}",
+    "RDS_HOST": "${rdsHost}",
+    "RDS_USER": "${rdsUser}",
+    "RDS_PASSWORD": "${rdsPassword}",
+    "RDS_DATABASE": "${rdsDatabase}",
+    "S3_BUCKET_ICONS": "${iconsS3Bucket}"
+  },
+  "vpc": {
+    "securityGroupIds": [],
+    "subnetIds": []
+  }
+}

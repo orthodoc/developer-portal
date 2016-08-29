@@ -5,7 +5,8 @@ var identity = require('../identity');
 var vandium = require('vandium');
 
 vandium.validation({
-  appId: vandium.types.string().required()
+  appId: vandium.types.string().required(),
+  version: vandium.types.string().required()
 });
 
 module.exports.handler = vandium(function(event, context, callback) {

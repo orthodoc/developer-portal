@@ -1,10 +1,10 @@
 {
-  "name": "vendor-apps-create-version",
+  "name": "vendor-apps-versions-detail",
   "runtime": "nodejs4.3",
   "description": "Serverless Lambda function for project: keboola-developer-portal",
   "customName": false,
   "customRole": false,
-  "handler": "create-version/handler.handler",
+  "handler": "versions-detail/handler.handler",
   "timeout": 30,
   "memorySize": 1024,
   "authorizer": {},
@@ -13,15 +13,15 @@
   },
   "endpoints": [
     {
-      "path": "vendor/apps/{appId}/versions",
-      "method": "POST",
+      "path": "vendor/apps/{appId}/versions/{version}",
+      "method": "GET",
       "type": "AWS",
       "authorizationType": "custom",
       "authorizerFunction": "authorizer",
       "apiKeyRequired": false,
       "requestParameters": {},
       "requestTemplates": {
-        "application/json": "{\"token\":\"$input.params().header.get('Authorization')\", \"body\":$input.json('$'), \"appId\": \"$input.params('appId')\"}"
+        "application/json": "{\"token\":\"$input.params().header.get('Authorization')\", \"appId\": \"$input.params('appId')\"\"version\": \"$input.params('version')\"}"
       },
       "responses": "$${endpointResponsesTemplate}"
     }

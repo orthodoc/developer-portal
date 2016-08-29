@@ -10,10 +10,11 @@ Application based on Serverless framework utilizing AWS Lamda, API Gateway and C
 
 ### Installation
 
-1. Checkout git repository: `git clone git@github.com:keboola/developer-portal.git`
-2. Cd into directory: `cd developer-portal`
-3. Install npm dependencies: `npm install`
-4. AWS Setup (so far has to be manual)
+1. Install Serverless O.5: `npm install serverless -g`
+2. Checkout git repository: `git clone git@github.com:keboola/developer-portal.git`
+3. Cd into directory: `cd developer-portal`
+4. Install npm dependencies: `npm install`
+5. AWS Setup (so far has to be manual)
     1. Verify email address used as sender for emails in SES console
         - Save the email to Serverless variable `sesEmail` (using command `sls variables set`)
     2. Create Cognito User Pool in AWS console
@@ -28,8 +29,8 @@ Application based on Serverless framework utilizing AWS Lamda, API Gateway and C
         - Put bucket's public url to sls variable `iconsPublicFolder`
     4. Create Myql 5.7 RDS
         - Put it's credentials to sls variables `rdsHost`, `rdsUser`, `rdsPassword` and `rdsDatabase`
-5. Deploy all resources using command `sls dash deploy`
-6. Extend created IAM policy for lambda functions with these statements: 
+6. Deploy all resources using command `sls dash deploy`
+7. Extend created IAM policy for lambda functions with these statements: 
 ```
 {
   "Effect": "Allow",

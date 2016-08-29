@@ -5,11 +5,6 @@ var identity = require('../identity');
 var vandium = require('vandium');
 
 module.exports.handler = vandium(function(event, context, callback) {
-  var dbCloseCallback = function(err, result) {
-    db.end();
-    return callback(err, result);
-  };
-
   db.connect();
   async.waterfall([
     function (callbackLocal) {
@@ -26,5 +21,8 @@ module.exports.handler = vandium(function(event, context, callback) {
         callbackLocal(err, res);
       });
     }
-  ], dbCloseCallback);
+  ], function(err, result) {
+    db.end();
+    return callback(err, result);
+  });
 });
