@@ -1,7 +1,7 @@
 {
   "name": "keboola-developer-portal",
   "custom": {
-    "cognitoUserIdentityPool": {
+    "cognitoUserPool": {
       "AliasAttributes": [],
       "EmailVerificationMessage": "{####}",
       "EmailVerificationSubject": "Verification of Keboola Developer Portal account",

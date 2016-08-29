@@ -32,7 +32,7 @@
     "events": [],
     "environment": {
         "REGION": "${region}",
-        "COGNITO_CLIENT_ID": "${cognitoUserIdentityPoolClientId}",
+        "COGNITO_CLIENT_ID": "${cognitoUserPoolClientId}",
         "RDS_HOST": "${rdsHost}",
         "RDS_USER": "${rdsUser}",
         "RDS_PASSWORD": "${rdsPassword}",

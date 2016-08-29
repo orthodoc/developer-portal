@@ -32,8 +32,8 @@
     "events": [],
     "environment": {
         "REGION": "${region}",
-        "COGNITO_POOL_ID": "${cognitoUserIdentityPoolId}",
-        "COGNITO_CLIENT_ID": "${cognitoUserIdentityPoolClientId}",
+        "COGNITO_POOL_ID": "${cognitoUserPoolId}",
+        "COGNITO_CLIENT_ID": "${cognitoUserPoolClientId}",
         "SES_EMAIL": "${sesEmail}"
     },
     "vpc": {

@@ -5,8 +5,7 @@ var vandium = require('vandium');
 
 vandium.validation({
   email: vandium.types.email().required().error(new Error("Parameter email is required")),
-  password: vandium.types.string().required().error(new Error("Parameter password is required")),
-  reset: vandium.types.string()
+  password: vandium.types.string().required().error(new Error("Parameter password is required"))
 });
 
 module.exports.handler = vandium(function(event, context, callback) {
@@ -31,5 +30,4 @@ module.exports.handler = vandium(function(event, context, callback) {
       });
     }
   });
-
 });

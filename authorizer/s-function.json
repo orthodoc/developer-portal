@@ -16,7 +16,7 @@
     "events": [],
     "environment": {
         "REGION": "${region}",
-        "COGNITO_POOL_ID": "${cognitoUserIdentityPoolId}"
+        "COGNITO_POOL_ID": "${cognitoUserPoolId}"
     },
     "vpc": {
         "securityGroupIds": [],

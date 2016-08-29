@@ -17,11 +17,6 @@ vandium.validation({
 });
 
 module.exports.handler = vandium(function(event, context, callback) {
-  var mainCallback = function(err, result) {
-    db.destroy();
-    return callback(err, result);
-  };
-
   db = mysql.createConnection({
     host: process.env.RDS_HOST,
     user: process.env.RDS_USER,
@@ -67,6 +62,7 @@ module.exports.handler = vandium(function(event, context, callback) {
       });
     }
   ], function(err) {
-    return mainCallback(err);
+    db.destroy();
+    return callback(err, result);
   });
 });
