@@ -1,92 +1,168 @@
 'use strict';
+var async = require('async');
+var aws = require('aws-sdk');
+var identity = require('lib/identity');
+var moment = require('moment');
+var mysql = require('mysql');
+const vandium = require('vandium');
 
-var jwt = require('lib/jwt');
-var response = require('lib/response');
 
-var CognitoHelper = require('cognito-helper');
-var cognito = new CognitoHelper({
-  AWS_ACCOUNT_ID: process.env.AWS_ACCOUNT_ID,
-  COGNITO_IDENTITY_POOL_ID: process.env.COGNITO_IDENTITY_POOL_ID,
-  COGNITO_DEVELOPER_PROVIDER_NAME: process.env.COGNITO_DEVELOPER_PROVIDER_NAME,
-  COGNITO_SEPARATOR: process.env.COGNITO_SEPARATOR || '----',
-  COGNITO_DATASET_NAME: process.env.COGNITO_DATASET_NAME || 'profile',
-  COGNITO_PASSWORD_RESET_URL: process.env.COGNITO_PASSWORD_RESET_URL || 'http://localhost:8100/app.html#/reset/{email}/{reset}',
-  COGNITO_PASSWORD_RESET_BODY: process.env.COGNITO_PASSWORD_RESET_BODY || 'Dear {name}, please follow the link below to reset your password:',
-  COGNITO_PASSWORD_RESET_SUBJECT: process.env.COGNITO_PASSWORD_RESET_SUBJECT || 'Password reset',
-  COGNITO_PASSWORD_RESET_SOURCE: process.env.COGNITO_PASSWORD_RESET_SOURCE || 'Password reset <noreply@yourdomain.com>'
-});
-
-var CustomCognitoHelper = require('lib/cognito-helper/cognito-helper');
-var customCognito = new CustomCognitoHelper({
-  AWS_ACCOUNT_ID: process.env.AWS_ACCOUNT_ID,
-  COGNITO_IDENTITY_POOL_ID: process.env.COGNITO_IDENTITY_POOL_ID,
-  COGNITO_DEVELOPER_PROVIDER_NAME: process.env.COGNITO_DEVELOPER_PROVIDER_NAME,
-  COGNITO_SEPARATOR: process.env.COGNITO_SEPARATOR || '----',
-  COGNITO_DATASET_NAME: process.env.COGNITO_DATASET_NAME || 'profile',
-  COGNITO_PASSWORD_RESET_URL: process.env.COGNITO_PASSWORD_RESET_URL || 'http://localhost:8100/app.html#/reset/{email}/{reset}',
-  COGNITO_PASSWORD_RESET_BODY: process.env.COGNITO_PASSWORD_RESET_BODY || 'Dear {name}, please follow the link below to reset your password:',
-  COGNITO_PASSWORD_RESET_SUBJECT: process.env.COGNITO_PASSWORD_RESET_SUBJECT || 'Password reset',
-  COGNITO_PASSWORD_RESET_SOURCE: process.env.COGNITO_PASSWORD_RESET_SOURCE || 'Password reset <noreply@yourdomain.com>'
-});
-
-module.exports.login = function (event, context, callback) {
-  //TODO
-  console.log('PROCESS ENV::', process.env);
-  var tokenCallback = function (err, data) {
-    if (err) {
-      callback(response.makeError(err), data);
-    }
-    else {
-      customCognito.getProfile(data.id, function (err, data) {
-        console.log(data);
-        if (data.isApproved) {
-          callback(null, {token: jwt.create(data.id)});
-        } else {
-          callback(new Error('User has not been approved yet.'));
-        }
+/**
+ * Confirm
+ */
+module.exports.confirm = vandium.createInstance({
+  validation: {
+    email: vandium.types.string().required().error(new Error("Parameter email is required")),
+    code: vandium.types.string().required().error(new Error("Parameter code is required"))
+  }
+}).handler(function(event, context, callback) {
+  var provider = new aws.CognitoIdentityServiceProvider({region: process.env.REGION});
+  async.waterfall([
+    function (callbackLocal) {
+      provider.confirmSignUp({
+        ClientId: process.env.COGNITO_CLIENT_ID,
+        ConfirmationCode: event.code,
+        Username: event.email
+      }, function(err) {
+        return callbackLocal(err);
+      });
+    },
+    function(callbackLocal) {
+      provider.adminDisableUser({
+        UserPoolId: process.env.COGNITO_POOL_ID,
+        Username: event.email
+      }, function(err) {
+        return callbackLocal(err);
       });
     }
-  };
+  ], function (err) {
+    if (err) return callback(err);
 
-  cognito.login(event.body.email, event.body.password, event.body.reset, tokenCallback);
-};
-
-module.exports.profile = function (event, context, callback) {
-
-  var ensureAuthenticated = function(callbackLocal) {
-    var t = jwt.verify(event.jwt);
-    if(t.message) {
-      callback(new Error('Unauthorized: ' + t.message));
-    }
-    else {
-      callbackLocal(t);
-    }
-  };
-
-  var dataCallback = function(err, data) {
-    if(err) {
-      callback(response.makeError(err));
-    }
-    else {
-      callback(null, data);
-    }
-  };
-
-  ensureAuthenticated(function(userId) {
-    cognito.getProfile(userId, dataCallback);
+    var ses = new aws.SES({apiVersion: '2010-12-01', region: process.env.REGION});
+    ses.sendEmail({
+      Source: process.env.SES_EMAIL,
+      Destination: { ToAddresses: [process.env.SES_EMAIL] },
+      Message: {
+        Subject: {
+          Data: '[dev-portal] User ' + event.email + ' requests approval'
+        },
+        Body: {
+          Text: {
+            Data: 'User ' + event.email + ' just signed up'
+          }
+        }
+      }
+    }, function(err) {
+      return callback(err);
+    });
   });
-};
+});
 
-module.exports.signup = function (event, context, callback) {
 
-  var tokenCallback = function (err, data) {
-    if (err) {
-      callback(response.makeError(err), data);
-    }
-    else {
-      callback(null, {token: jwt.create(data.id)});
+/**
+ * Login
+ */
+module.exports.login = vandium.createInstance({
+  validation: {
+    email: vandium.types.email().required().error(new Error("Parameter email is required")),
+    password: vandium.types.string().required().error(new Error("Parameter password is required"))
+  }
+}).handler(function(event, context, callback) {
+  var params = {
+    AuthFlow: 'ADMIN_NO_SRP_AUTH',
+    ClientId: process.env.COGNITO_CLIENT_ID,
+    UserPoolId: process.env.COGNITO_POOL_ID,
+    AuthParameters: {
+      USERNAME: event.email,
+      PASSWORD: event.password
     }
   };
 
-  customCognito.signup(event.body.name, event.body.email, event.body.password, event.body.vendor, tokenCallback);
-};
+  var identity = new aws.CognitoIdentityServiceProvider({region: process.env.REGION});
+  identity.adminInitiateAuth(params, function(err, data) {
+    if (err) {
+      return callback(err);
+    } else {
+      return callback(null, {
+        token: data.AuthenticationResult.AccessToken, //data.AuthenticationResult.IdToken,
+        expires: moment().add(data.AuthenticationResult.ExpiresIn, 's').utc().format()
+      });
+    }
+  });
+});
+
+/**
+ * Profile
+ */
+module.exports.profile = vandium.createInstance({
+  validation: {
+    token: vandium.types.string().required()
+  }
+}).handler(function(event, context, callback) {
+  identity.getUser(event.token, callback);
+});
+
+
+/**
+ * Signup
+ */
+module.exports.signup = vandium.createInstance({
+  validation: {
+    name: vandium.types.string().required().error(new Error('Parameter name is required')),
+    email: vandium.types.email().required().error(new Error('Parameter email is required')),
+    password: vandium.types.string().required().min(8)
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}/)
+      .error(new Error('Parameter password is required, must have at least 8 characters and contain at least one '
+        + 'lowercase letter, one uppercase letter, one number and one special character')),
+    vendor: vandium.types.string().required().error(new Error('Parameter vendor is required'))
+  }
+}).handler(function(event, context, callback) {
+  var db = mysql.createConnection({
+    host: process.env.RDS_HOST,
+    user: process.env.RDS_USER,
+    password: process.env.RDS_PASSWORD,
+    database: process.env.RDS_DATABASE,
+    ssl: 'Amazon RDS'
+  });
+
+  async.waterfall([
+    function(callbackLocal) {
+      db.query('SELECT * FROM `vendors` WHERE `id` = ?', [event.vendor], function(err, result) {
+        if (err) return callbackLocal(err);
+
+        if (result.length === 0) {
+          return callbackLocal(Error('Vendor ' + id + ' does not exist'));
+        }
+
+        return callbackLocal();
+      });
+    },
+    function(callbackLocal) {
+      var provider = new aws.CognitoIdentityServiceProvider({region: process.env.REGION});
+      provider.signUp({
+        ClientId: process.env.COGNITO_CLIENT_ID,
+        Username: event.email,
+        Password: event.password,
+        UserAttributes: [
+          {
+            Name: 'email',
+            Value: event.email
+          },
+          {
+            Name: 'name',
+            Value: event.name
+          },
+          {
+            Name: 'profile',
+            Value: event.vendor
+          }
+        ]
+      }, function(err) {
+        return callbackLocal(err);
+      });
+    }
+  ], function(err) {
+    db.destroy();
+    return callback(err, result);
+  });
+});

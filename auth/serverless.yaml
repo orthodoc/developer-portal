@@ -1,6 +1,27 @@
-service: developer-portal-auth
+service: keboola-developer-portal-auth
 
-provider: aws
+provider:
+  name: aws
+  runtime: nodejs4.3
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:PutObject",
+        - "s3:GetObject",
+        - "s3:ReplicateObject"
+      Resource:
+        - "arn:aws:s3:::${appIconsBucket}/*"
+    - Effect: "Allow"
+      Action:
+        - "ses:SendEmail"
+      Resource:
+        - "*"
+    - Effect: "Allow"
+      Action:
+        - "cognito-identity:*"
+        - "cognito-idp:*"
+      Resource:
+        - "${cognitoPoolArn}"
 
 defaults:
   stage: dev
@@ -15,21 +36,57 @@ exclude:
   - package.json
 
 environment:
-  AWS_ACCOUNT_ID: ${awsAccountId}
-  COGNITO_IDENTITY_POOL_ID: ${cognitoIdentityPoolId}
-  COGNITO_DEVELOPER_PROVIDER_NAME: ${cognitoDeveloperProviderName
-  JWT_SECRET: ${jwtSecret}
+  REGION: ${awsRegion}
+  COGNITO_CLIENT_ID: ${cognitoClientId}
+  COGNITO_POOL_ID: ${cognitoPoolId}
+  SES_EMAIL: ${sesEmail}
+  RDS_HOST: ${rdsHost}
+  RDS_USER: ${rdsUser}
+  RDS_PASSWORD: ${rdsPassword}
+  RDS_DATABASE: ${rdsDatabase}
 
 functions:
+  confirm:
+    handler: auth.confirm
+    events:
+      - http:
+        method: get
+        path: auth/confirm
+        cors: true
   login:
     handler: auth.login
     events:
-      - http: POST auth/login
+      - http:
+        method: post
+        path: auth/login
+        cors: true
   profile:
     handler: auth.profile
     events:
-      - http: GET auth/profile
+      - http:
+        path: auth/profile
+        method: get
+        authorizer: xxx:xxx:Lambda-Name
+        cors: true
   signup:
     handler: auth.signup
     events:
-      - http: POST auth/signup
+      - http:
+        method: post
+        path: auth/signup
+        cors: true
+
+resources:
+  Resources:
+    IconsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${appIconsBucket}
+    Database:
+      Type: AWS::RDS::DBInstance
+      Properties:
+        Engine: MySQL
+        EngineVersion: 5.7
+        DBName: ${rdsDatabase}
+        MasterUsername: ${rdsUser}
+        MasterUserPassword: ${rdsPassword}

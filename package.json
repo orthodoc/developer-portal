@@ -1,20 +1,22 @@
 {
-    "name": "developer-portal",
-    "author": "Jakub Matejka <jakub@keboola.com>",
-    "license": "MIT",
-    "version": "1.0.0",
-    "description": "Keboola Developer Portal",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/keboola/developer-portal.git"
-    },
-    "main": "server.js",
-    "dependencies": {
-
-    },
-    "devDependencies": {
-        "chai": "*",
-        "mocha": "*"
-    },
-    "scripts": {}
+  "name": "developer-portal",
+  "author": "Jakub Matejka <jakub@keboola.com>",
+  "license": "MIT",
+  "version": "1.0.0",
+  "description": "Keboola Developer Portal",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/keboola/developer-portal.git"
+  },
+  "main": "server.js",
+  "dependencies": {
+    "serverless": "^1.0.0-beta.2"
+  },
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "*"
+  },
+  "scripts": {
+    "sls": "./node_modules/serverless/bin/serverless"
+  }
 }
