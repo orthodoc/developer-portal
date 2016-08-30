@@ -12,7 +12,7 @@ vandium.validation({
 });
 
 module.exports.handler = vandium(function(event, context, callback) {
-  var provider = new aws.CognitoIdentityServiceProvider({region: process.env.REGION})
+  var provider = new aws.CognitoIdentityServiceProvider({region: process.env.REGION});
   provider.changePassword({
     PreviousPassword: event.old_password,
     ProposedPassword: event.new_password,

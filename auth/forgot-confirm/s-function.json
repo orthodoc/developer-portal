@@ -1,0 +1,41 @@
+{
+    "name": "auth-forgot-confirm",
+    "runtime": "nodejs4.3",
+    "description": "Serverless Lambda function for project: keboola-developer-portal",
+    "customName": false,
+    "customRole": false,
+    "handler": "forgot-confirm/handler.handler",
+    "timeout": 30,
+    "memorySize": 1024,
+    "authorizer": {},
+    "custom": {
+        "cors": {
+            "allowOrigin": "*",
+            "allowHeaders": ["Content-Type", "X-Amz-Date", "Authorization", "X-Api-Key"]
+        }
+    },
+    "endpoints": [
+        {
+            "path": "auth/forgot/confirm",
+            "method": "POST",
+            "type": "AWS",
+            "authorizationType": "none",
+            "authorizerFunction": false,
+            "apiKeyRequired": false,
+            "requestParameters": {},
+            "requestTemplates": {
+                "application/json": "{\"email\":\"$input.params('email')\", \"password\":\"$input.params('password')\", \"code\":\"$input.params('code')\"}"
+            },
+            "responses": "$${endpointResponsesTemplate}"
+        }
+    ],
+    "events": [],
+    "environment": {
+        "REGION": "${region}",
+        "COGNITO_CLIENT_ID": "${cognitoUserPoolClientId}"
+    },
+    "vpc": {
+        "securityGroupIds": [],
+        "subnetIds": []
+    }
+}
