@@ -77,10 +77,11 @@ module.exports = {
       });
   },
 
-  listAllPublishedApps: function(callback) {
-    db.query('SELECT a.id, a.vendor_id, av.name, a.current_version, av.type, av.short_description '
-      + 'FROM `apps` AS `a` LEFT JOIN `app_versions` `av` ON (`a`.`id` = `av`.`app_id` AND `a`.`current_version` = `av`.`version`)'
-      + 'WHERE `a`.`is_approved` = 1 AND `a`.`current_version` IS NOT NULL;', function(err, result) {
+  listAllPublishedApps: function(offset, limit, callback) {
+    db.query('SELECT a.id, a.vendor_id, av.name, a.current_version, av.type, av.short_description ' +
+      'FROM apps AS a LEFT JOIN app_versions av ON (a.id = av.app_id AND a.current_version = av.version) ' +
+      'WHERE a.is_approved = 1 AND a.current_version IS NOT NULL ' +
+      'ORDER BY av.name LIMIT ? OFFSET ?;', [limit, offset], function(err, result) {
       if (err) return callback(err);
       return callback(err, result);
     });

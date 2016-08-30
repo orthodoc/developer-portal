@@ -21,7 +21,7 @@
       "apiKeyRequired": false,
       "requestParameters": {},
       "requestTemplates": {
-        "application/json": ""
+        "application/json": "{\"offset\":\"$input.params('offset')\", \"limit\":\"$input.params('limit')\"}"
       },
       "responses": "$${endpointResponsesTemplate}"
     }

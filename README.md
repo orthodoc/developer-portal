@@ -10,7 +10,7 @@ Application based on Serverless framework utilizing AWS Lamda, API Gateway and C
 
 ### Installation
 
-1. Install Serverless O.5: `npm install serverless -g`
+1. Install Serverless 0.5: `npm install serverless -g`
 2. Checkout git repository: `git clone git@github.com:keboola/developer-portal.git`
 3. Cd into directory: `cd developer-portal`
 4. Install npm dependencies: `npm install`

@@ -135,17 +135,19 @@ module.exports = {
     });
   },
 
-  listAppsForVendor: function(vendor, callback) {
-    db.query('SELECT a.id, a.vendor_id, a.name, a.current_version, a.type, a.short_description '
-      + 'FROM `apps` AS `a` '
-      + 'WHERE `a`.`vendor_id`=?;', vendor, function(err, result) {
+  listAppsForVendor: function(vendor, offset, limit, callback) {
+    db.query('SELECT a.id, a.vendor_id, a.name, a.current_version, a.type, a.short_description ' +
+      'FROM apps AS a ' +
+      'WHERE a.vendor_id = ?' +
+      'ORDER BY a.name LIMIT ? OFFSET ?;', [vendor, limit, offset], function(err, result) {
       if (err) return callback(err);
       return callback(err, result);
     });
   },
 
-  listAppVersions: function(id, callback) {
-    db.query('SELECT * FROM app_versions WHERE app_id=?;', id, function(err, result) {
+  listAppVersions: function(id, offset, limit, callback) {
+    db.query('SELECT * FROM app_versions WHERE app_id = ? ' +
+      'ORDER BY created_time LIMIT ? OFFSET ?;', [id, limit, offset], function(err, result) {
       if (err) return callback(err);
       return callback(err, result);
     });

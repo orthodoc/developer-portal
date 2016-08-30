@@ -5,7 +5,9 @@ var identity = require('../identity');
 var vandium = require('vandium');
 
 vandium.validation({
-  appId: vandium.types.string().required()
+  appId: vandium.types.string().required(),
+  offset: vandium.types.number().default(0),
+  limit: vandium.types.number().default(100)
 });
 
 module.exports.handler = vandium(function(event, context, callback) {
@@ -15,7 +17,7 @@ module.exports.handler = vandium(function(event, context, callback) {
       identity.getUser(event.token, callbackLocal);
     },
     function(user, callbackLocal) {
-      db.listAppVersions(event.appId, function(err, res) {
+      db.listAppVersions(event.appId, event.offset, event.limit, function(err, res) {
         if (err) return callbackLocal(err);
         res.map(function(data) {
           data.id = data.app_id;
