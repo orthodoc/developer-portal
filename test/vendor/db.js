@@ -249,7 +249,7 @@ describe('db', function() {
             rds.query('INSERT INTO `apps` SET id=?, vendor_id=?, name="test", type="reader";', ['ex-' + Math.random(), vendor2], function(err) {
               if (err) throw err;
               db.connect();
-              db.listAppsForVendor(vendor, function(err, res) {
+              db.listAppsForVendor(vendor, 0, 100, function(err, res) {
                 expect(err).to.be.null;
                 expect(res).to.have.length(1);
                 expect(res[0].id).to.be.equal(appId);
