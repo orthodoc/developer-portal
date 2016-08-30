@@ -306,7 +306,14 @@ API call generates pre-signed urls to S3 where you can upload app icons.
                 "expires": "2016-08-12T16:16:27Z"
             }
 
-### List all vendor apps [GET /vendor/apps]
+### List all vendor apps [GET /vendor/apps?offset=0&limit=100]
+
++ Parameters
+    + offset (optional) - pagination offset
+        + Default: 0
+    + limit (optional) - pagination limit
+        + Default: 100
+
 
 + Response 200 (application/json)
 
@@ -446,10 +453,14 @@ Request will be sent only if the app has icons uploaded and all these attributes
                 "is_approved": false
             }
 
-### List versions [GET /vendor/apps/{appId}/versions]
+### List versions [GET /vendor/apps/{appId}/versions?offset=0&limit=100]
 
 + Parameters
-    + appId - id of the application, it is prefixed by vendor id, e.g. `keboola.ex-adwords`
+    + appId
+    + offset (optional) - pagination offset
+        + Default: 0
+    + limit (optional) - pagination limit
+        + Default: 100
     
 + Request
 
@@ -543,7 +554,13 @@ Request will be sent only if the app has icons uploaded and all these attributes
 
 ## Public Apps API [/apps]
 
-### List all published apps [GET /apps]
+### List all published apps [GET /apps?offset=0&limit=100]
+
++ Parameters
+    + offset (optional) - pagination offset
+        + Default: 0
+    + limit (optional) - pagination limit
+        + Default: 100
 
 + Response 200 (application/json)
 
