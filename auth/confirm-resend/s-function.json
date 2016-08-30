@@ -1,10 +1,10 @@
 {
-  "name": "auth-confirm",
+  "name": "auth-confirm-resend",
   "runtime": "nodejs4.3",
   "description": "Serverless Lambda function for project: keboola-developer-portal",
   "customName": false,
   "customRole": false,
-  "handler": "confirm/handler.handler",
+  "handler": "confirm-resend/handler.handler",
   "timeout": 30,
   "memorySize": 1024,
   "authorizer": {},
@@ -16,20 +16,7 @@
   },
   "endpoints": [
     {
-      "path": "auth/confirm/{email}/{code}",
-      "method": "GET",
-      "type": "AWS",
-      "authorizationType": "none",
-      "authorizerFunction": false,
-      "apiKeyRequired": false,
-      "requestParameters": {},
-      "requestTemplates": {
-        "application/json": "{\"email\": \"$input.params('email')\", \"code\": \"$input.params('code')\"}"
-      },
-      "responses": "$${endpointResponsesTemplate}"
-    },
-    {
-      "path": "auth/confirm/{email}/{code}",
+      "path": "auth/confirm",
       "method": "POST",
       "type": "AWS",
       "authorizationType": "none",
@@ -37,7 +24,7 @@
       "apiKeyRequired": false,
       "requestParameters": {},
       "requestTemplates": {
-        "application/json": "{\"email\": \"$input.params('email')\", \"code\": \"$input.params('code')\"}"
+        "application/json": "{\"email\": \"$input.params('email')\", \"password\": \"$input.params('code')\"}"
       },
       "responses": "$${endpointResponsesTemplate}"
     }

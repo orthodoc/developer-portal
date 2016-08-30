@@ -63,6 +63,6 @@ module.exports.handler = vandium(function(event, context, callback) {
     }
   ], function(err) {
     db.destroy();
-    return callback(err, result);
+    return callback(err);
   });
 });
