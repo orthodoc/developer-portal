@@ -42,6 +42,21 @@ Account needs to be confirmed by code from confirmation email sent on his email 
 
 + Response 204
 
+### Resend confirmation code [POST /auth/confirm]
+
++ Attributes
+    + email (required)
+    + password (required)
+
++ Request (application/json)
+
+        {
+            "email": "john@keboola.com",
+            "password": "superSecret"
+        }
+
++ Response 204
+
 ### Login [POST /auth/login]
 
 + Attributes
@@ -64,7 +79,7 @@ Account needs to be confirmed by code from confirmation email sent on his email 
                 "expires": "2016-08-12T09:25:56Z"
             }
             
-### Get user profile [GET /auth/me]
+### Get user profile [GET /auth/profile]
 
 + Request
 
@@ -82,6 +97,62 @@ Account needs to be confirmed by code from confirmation email sent on his email 
                 "name": "John Doe",
                 "vendor": "keboola"
             }
+            
+### Change password [PUT /auth/profile]
+
++ Attributes
+    + old_password (required)
+    + new_password (required)
+
++ Request
+
+    + Headers
+
+            Authorization: {your_token}
+    + Body
+
+            {
+                "old_password": "old password",
+                "new_password": "new password"
+            }
+            
++ Response 204 (application/json)
+
+### Forgot password [POST /auth/forgot]
+
+Sends email with confirmation code which has to be used in the next API call
+
++ Attributes
+    + email (required)
+
++ Request
+
+    + Body
+
+            {
+                "email": "john@keboola.com"
+            }
+            
++ Response 204 (application/json)
+
+### Forgot password confirmation [POST /auth/forgot/confirm]
+
++ Attributes
+    + email (required)
+    + code (required)
+    + password (required)
+
++ Request
+
+    + Body
+
+            {
+                "email": "john@keboola.com",
+                "code": "your code from email",
+                "password": "new password"
+            }
+            
++ Response 204 (application/json)
             
 ## Apps [/vendor/apps]
 
